@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                                                  http://www.springframework.org/schema/context
+                                                  http://www.springframework.org/schema/context/spring-context.xsd
+                                                  http://www.springframework.org/schema/aop
+                                                       http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+	<context:component-scan base-package="aop"></context:component-scan>
+	<!-- AOP 설정하는 태그 -->
+	<aop:config>
+		<aop:aspect id="traceAspect" ref="logPrintProfiler"><!-- aspect 설정하겠다.(공통기능) -->
+			<!-- p250~p252 AspectJ의 Pointcut 표현식 -->
+			<!-- execution(수식어패턴? 리턴타입패턴 클래스이름패턴?메서드이름패턴(파라미터패턴)  (?는 1번 와도 되고 안와도 된다는 뜻 )-->
+			<!-- 
+				수식어 패턴은 스프링 AOP의 경우 public 메서드에만 작용가능하기 때문에 쓰던 안쓰던 public
+				클래스 패턴도 와도 좋고 안와도 좋음
+				net.madvirus.spring4.chap06.* == 패키지 안에 있는 모든 메서드 호출
+				* 모든 값을 표현
+				.. 0개 이상이라는 의미 표현(패키지에 쓰면 하위 패키지까지)
+			 -->
+			<!-- 
+				public : 메서드의 접근 지정자는 public이고
+				* : 리턴타입은 아무거나 상관없다.
+				aop.. : aop 패키지 및 하위 패키지에 있는
+				*.* : 메서드 이름이 아무거나 상관없다.
+				(*,*) 매개변수는 상관없다.
+			 -->
+			<aop:around method="trace" pointcut="execution(public * aop..*.*(*,*))"/><!-- Around Advice로 사용할 메서드 / pointcut="AspectJ문법 pointcut 설정"-->
+		</aop:aspect><!-- LogPrintProfiler 클래스에 Component 애노테이션을 주었음 -->
+	</aop:config>
+
+
+</beans>

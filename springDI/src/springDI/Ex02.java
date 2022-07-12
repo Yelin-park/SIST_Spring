@@ -45,11 +45,7 @@ public class Ex02 {
 		rvi.output();
 		
 		// 실행을 시키니까 에러 발생 ( exception in thread "main" java.lang.noclassdeffounderror: org/apache/commons/logging/logfactory )
-		// 스프링 주요 모듈 추가 + 의존 모듈 추가 commons-logging.jar (C:\spring-framework-3.0.2.RELEASE-dependencies\org.apache.commons\com.springsource.org.apache.commons.logging\1.1.1)
- 
-		
-
-		
+		// 스프링 주요 모듈 추가 + 의존 모듈 추가 commons-logging.jar (C:\spring-framework-3.0.2.RELEASE-dependencies\org.apache.commons\com.springsource.org.apache.commons.logging\1.1.1)	
 		
 	} // main
 

@@ -1,0 +1,41 @@
+[ 1일차복습.txt ]
+
+1. 스프링?
+	- 자바 개발자라면 반드시 알아야하는 표준 프레임 워크
+
+2. 스프링 사용하는 방법
+	- jar 파일 추가
+	- 메이븐(Maven) 빌드 도구 : 프로젝트 생성~배포 / pom.xml <dependency> 태그 안에 코딩
+		서버 중앙 저장소(central repository) -> jar 다운 받아서 -> 로컬 저장소
+	- java Project + build path
+	c:spring 3.x + 2 개의 압축파일 풀어서 라이브러리 참조
+	스프링 주요 모듈이 의존하고 있는 라이브러리 commons-logging-1.1.1.jar 추가
+	
+3. applicationContext.xml 파일은 무엇이고 안에 있는 코딩의 의미
+	- 스프링을 사용해서 객체 생성 + 조립(DI)
+		1) XML 설정 파일 사용하는 방법 (ex. 레고 설명서)
+			RecordImple record = new RecordImple();
+			스프링 빈 객체를 공장(ApplicationContext) 스프링 컨테이너(di 컨테이너, ioc 컨테이너)
+			<bean id="record" class="di.RecordImpl"></bean> == 스프링 빈 객체 생성
+			<bean id="rvi" class="di.RecordViewImpl">
+				<constructor-arg ref="record"></constructor-arg> 생성자를 통해서 DI 설정
+	 			<property name="record" ref="record"></property> 프로퍼티 설정을 통해서 DI 설정
+			</bean>
+
+4. Ex02.java 안에 있는 main() {} 함수 안에 있는 코딩 설명
+	- String으로 xml 파일 경로를 저장하고
+		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext(resourceLocations);
+		스프링 컨테이너에서 객체 생성 및 조립을 한 상태로 컨테이너에서 만든 객체를 얻어와서 사용한다.
+5. 
+-------------------------------------------
+
+스프링 빈 객체 생성 + 조립(DI) 을 하는 공장은 스프링 컨테이너
+Car <- Engine
+	DI
+	의존성 주입
+	
+스프링 컨테이너(공장) 5가지 
+	GenericXmlApplicationContext - xml 파일을 이용한 DI 설정
+	???? ApplicationContext - 자바코드를 이용한 DI 설정(p85)
+> xml 파일에 설정하는 대신에 자바코딩으로 설정하는 것 
+

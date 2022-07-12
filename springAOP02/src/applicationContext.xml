@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+
+<!-- CalculatorImpl과 LogPrintAroundAdvice 객체 생성 -->
+ <bean id="calc" class="aop.CalculatorImpl"></bean>
+ <bean id="logPrintAroundAdvice" class="aop.advice.LogPrintAroundAdvice"></bean>
+ <bean id="logPrintBeforeAdvice" class="aop.advice.LogPrintBeforeAdvice"></bean>
+ <bean id="logPrintAfterReturningAdvice" class="aop.advice.LogPrintAfterReturningAdvice"></bean>
+
+<!-- calc.add() / sub() 등등의 메서드를 Pointcut 설정을 해서 Around Advice 등록 -->
+<!-- 스프링의 AOP : 프록시(proxy) 기반 : 핵심기능 + 공통 기능을 더해서 가짜를 만듬 -->
+<!-- 프록시 빈을 생성하겠다. -->
+ <bean id="calcProxy" class="org.springframework.aop.framework.ProxyFactoryBean"><!-- 아무 자바 파일에 가서 ProxyFactoryBean 자동 완성해서 import 구문 잘라내서 붙여넣기 -->
+  <!-- 1. 핵심 기능을 하는 객체 setTarget(calc) : 핵심 기능 설정 (target이라는 이름으로 CalculatorImpl 설정) -->
+  <property name="target" ref="calc"></property>
+  
+  <!-- 2. Pointcut 설정(공통기능이 실제로 적용될 지점) -->
+  <!-- setProxyInterfaces(Class[] proxyInterfaces) : 매개변수가 배열임 -->
+  <!-- 배열이기 때문에 <list> 안에 <value>로 여러 개 설정 가능 -->
+  <property name="proxyInterfaces"><!-- 인터페이스로 주기 때문에 -->
+   <list>
+    <value>aop.Calculator</value><!-- 실제 구현한 클래스가 아니라 인터페이스로 줌(문법) -->
+   </list>
+  </property><!-- setProxyInterfaces -->
+  
+  <!-- 3. Advice 등록(5가지 종류 등록 가능) -->
+  <!-- setInterceptorNames(Class[] interceptorNames) : 매개변수가 배열임 -->
+  <property name="interceptorNames">
+   <list>
+     <value>logPrintAroundAdvice</value><!-- 전후 Advice  -->
+     <value>logPrintBeforeAdvice</value><!-- 전 Advice -->
+     <value>logPrintAfterReturningAdvice</value><!-- 후 Advice -->
+   </list>
+  </property>
+ </bean>
+
+
+</beans>
