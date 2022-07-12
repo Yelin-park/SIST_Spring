@@ -34,8 +34,8 @@
   <property name="interceptorNames">
    <list>
      <value>logPrintAroundAdvice</value><!-- 전후 Advice  -->
-     <value>logPrintBeforeAdvice</value><!-- 전 Advice -->
-     <value>logPrintAfterReturningAdvice</value><!-- 후 Advice -->
+     <value>logPrintBeforeAdvice</value> <!-- 전 Advice -->
+     <value>logPrintAfterReturningAdvice</value> <!-- 후 Advice -->
    </list>
   </property>
  </bean>
