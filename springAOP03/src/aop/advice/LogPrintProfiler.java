@@ -50,9 +50,5 @@ public class LogPrintProfiler {
 		}
 		return result;
 	} // trace
-	
-	// 2. Before Advice
-	// 3. After Advice
-
 
 } // class

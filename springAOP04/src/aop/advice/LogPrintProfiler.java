@@ -17,8 +17,9 @@ import org.springframework.util.StopWatch;
 @Aspect // <aop:aspect id="traceAspect" ref="logPrintProfiler"> 코딩과 같음
 public class LogPrintProfiler {
 
-	@Pointcut("execution(public * aop..*.*(*,*))") // <aop:after method="afterFinally" pointcut="execution(public * aop..*.*(*,*))" />
-	private void publicMethod() {}
+	// <aop:after method="afterFinally" pointcut="execution(public * aop..*.*(*,*))" />
+	@Pointcut("execution(public * aop..*.*(*,*))") 
+	public void publicMethod() {}
 	
 	// 3. After Advice
 	// @After(value="execution(public * aop..*.*(*,*))")
@@ -65,9 +66,5 @@ public class LogPrintProfiler {
 		}
 		return result;
 	} // trace
-	
-	// 2. Before Advice
-	// 3. After Advice
-
 
 } // class

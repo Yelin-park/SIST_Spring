@@ -1,0 +1,23 @@
+/customer/notice.htm
+
+[에러 메시지]
+7월 13, 2022 4:20:40 오후 org.springframework.web.servlet.DispatcherServlet noHandlerFound
+경고: No mapping found for HTTP request with URI [/springMVC/customer/notice.htm] in DispatcherServlet with name 'dispatcher'
+ > 핸들러를 못찾는다.
+
+[해결]
+dispatcher-servlet에서 코드 추가
+ <bean id="noticeDao" class="newlecture.dao.NoticeDao"></bean>
+ 
+ <!-- name 속성으로 요청URL을 주면 자동으로 요청URL과 매칭되는 컨트롤러 검색 -->
+ <bean name="/customer/notice.htm" class="controllers.customer.NoticeController">
+ 	<property name="noticeDao" ref="noticeDao"></property>
+ </bean>
+ 
+ 
+ [문제]
+ 공지사항 목록에서 클릭하면 상세보기
+ http://localhost/springMVC/customer/noticeDetail.htm?seq=1
+ 
+ NoticeDetailController 컨트롤러 -> noticeDetail.jsp 데이터 뿌리기
+ 

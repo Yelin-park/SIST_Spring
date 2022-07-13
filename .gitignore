@@ -1,0 +1,9 @@
+.metadata
+Servers
+springMVC/.settings
+springMVC/build
+springMVC/.classpath
+springMVC/.project
+springMVC/.tern-project
+springMVC/src/main/webapp/META-INF/MANIFEST.MF
+springMVC/src/main/webapp/WEB-INF/lib

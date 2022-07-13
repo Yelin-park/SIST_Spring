@@ -1,74 +1,80 @@
-<%@ page contentType="text/html; charset=UTF-8"  pageEncoding="UTF-8"%>
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>2022. 7. 13. - 오후 12:35:27</title>
-<link rel="shortcut icon" type="image/x-icon" href="../images/SiSt.ico">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-</head>
-<body>
-<h3>index.jsp</h3>
-<pre>
-1. JSP/Servlet MVC 패턴
-	1) MV[C] 컨트롤러 선언 DispatcherServlet.java == 서블릿
-	
-	2) commandHandler.properties 생성해서
-	   list.do=ListHandler
-	
-         	> commandHandlerMap에 넣었음
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-	3) CommandHandler 인터페이스 선언
-	   ListHandler 클래스 선언 [M]VC
-		세션, request.setAttribute("", );
-		return null 리다이렉트
-		return "list.jsp" 포워딩
-	
-	4) ListService 클래스
-	   BoardDAO 인터페이스
-	   BoardDAOImpl 클래스
-
-2. 스프링 MVC 패턴 작업(Part02 Chapter07 p258)
-	p268 기본 흐름과 주요 컴포넌트
-	[그림 7.4 스프링 MVC 웹 요청 처리 과정] p268
-	[표 7.1 스프링 MVC의 주요 구성요소] p269
-	(완벽하게 이해하고 암기)
-
-스프링에서는 컨트롤러를 그냥 컨트롤러라고 부르지 않음!(JSP MVC와 다름) front 컨트롤러 부름
-
-웹브라우저[list.do] (1)요청 -> MV[C] front 컨트롤러 		-> (2)요청URI/컨트롤러 검색
-				:DispatcherServlet 구성요소	<-	:HandlerMapping 구성요소
-
-				-> (3)처리요청			-> (4) 요청 처리 [M]VC 컨트롤러
-				:HandlerAdapter 구성요소        <- 처리 결과 리턴
-
-				<- (6) 처리 결과를 리턴 
-				Model	결과물 저장
-				ModelAndView
-
-				-> (7) 처리 결과물을 보여줄 View 검색 
-				:ViewResolver 구성요소
-				
-				<- (8) 검색된 View를 front Controller에게 알려준다.
-				
-				-> (9) Viewp에게 화면에 보여줄 응답을 생성하라고 요청  -> (10) list.jsp
-				:View 구성요소
-
-
-MVC의 M에 해당하는 모델핸들러는 스프링에서는 컨트롤러
-중앙 제어하는 디스패처 서블릿은 front 컨트롤러
-
-list.do 요청 -> ListHandler 검색 -> front 컨트롤러인 :DispatcherServlet에게 전달 -> front 컨트롤러가
-					
-properties 파일 안만들고 HandlerMapping 스프링 빈 객체가 요청 URL과 매칭되는 컨트롤러(XXXHandler == 핸들러 객체) 검색
-
-
-3. 스프링 MVC 프로젝트 생성
-	1) Dynamic Web Project 생성 - springMVC
-</pre>
-<pre>
-	1. WEB-INF/lib 폴더에 필요한 jar 파일 추가
-</pre>
-</body>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+		<title>index</title>
+		<link href="index.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
+		<div id="header">
+			<div class="top-wrapper">
+				<h1 id="logo"><a href="/"><img src="images/logo.png" alt="뉴렉처" /></a></h1>
+				<h2 class="hidden">메인메뉴</h2>
+				<ul id="mainmenu" class="block_hlist">
+					<li>
+						<a href="">학습가이드</a>
+					</li>
+					<li>
+						<a href="" >과정선택</a>
+					</li>
+					<li>
+						<a href="" >인기과정</a>
+					</li>
+				</ul>
+				<form id="searchform" action="" method="get">
+					<fieldset>
+						<legend class="hidden">
+							과정검색폼
+						</legend>
+						<label for="query">과정검색</label>
+						<input type="text" name="query" />
+						<input type="submit" class="button" value="검색" />
+					</fieldset>
+				</form>
+				<h3 class="hidden">로그인메뉴</h3>
+				<ul id="loginmenu" class="block_hlist">
+					<li>
+						<a href="/index.jsp">HOME</a>
+					</li>
+					<li>
+						<a href="joinus/login.jsp">로그인</a>
+					</li>
+					<li>
+						<a href="joinus/join.jsp">회원가입</a>
+					</li>
+				</ul>
+				<h3 class="hidden">회원메뉴</h3>
+				<ul id="membermenu" class="clear">
+					<li>
+						<a href=""><img src="images/menuMyPage.png" alt="마이페이지" /></a>
+					</li>
+					<li>
+						<a href="customer/notice.jsp"><img src="images/menuCustomer.png" alt="고객센터" /></a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div id="main">
+			
+		</div>
+		<div id="footer">
+			<div class="top-wrapper">
+				<h2><img src="images/footerLogo.png" alt="뉴렉처"/></h2>
+				<p>				
+					<address id="ad">
+						사업자등록번호 : 000-00-00000000 통신판매업신고 : 서울 0000-000 관리자 : 홍길동
+						<br/>
+						주소 : 서울시 000구 001동 000-0 00빌딩 0층 전화 : 02-000-0000 팩스 : 02-000-0000
+					</address>
+				</p>				
+				<p>
+					Copyright ⓒ newlecture.com 2012-2012 All Right Reserved. Contact master@newlecture.com for more information
+				</p>
+			</div>
+		</div>
+	</body>
 </html>
