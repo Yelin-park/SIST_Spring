@@ -31,7 +31,19 @@
 				(*,*) 매개변수는 상관없다.
 			 -->
 			 <!-- Around Advice로 사용할 메서드 / pointcut="AspectJ문법 pointcut 설정"-->
-			<aop:around method="trace" pointcut="execution(public * aop..*.*(*,*))"/><!-- logPrintProfiler Aspect의 trace() 메서드 사용 -->
+			 <!-- logPrintProfiler Aspect의 trace() 메서드 사용 -->
+			<!-- <aop:around method="trace" pointcut="execution(public * aop..*.*(*,*))"/> -->
+			<!-- aop 패키지+하위패키지 안에 있는 모든 클래스들 중에 add 메서드를 호출할 때 Before Advice 장착 -->
+			<!-- <aop:before method="before" pointcut="execution(* aop..*.add(*,*))"/> -->
+			<!-- <aop:after method="afterFinally" pointcut="execution(* aop..*.mult(*,*))" /> -->
+			
+			
+			
+			<!-- Pointcut 속성의 값이 동일한 경우 -->
+			<aop:pointcut expression="execution(public * aop..*.*(*,*))" id="publicMethod"/>
+			<aop:around method="trace" pointcut-ref="publicMethod"/>
+			<aop:before method="before" pointcut-ref="publicMethod"/>
+			<aop:after method="afterFinally" pointcut-ref="publicMethod" />
 		</aop:aspect><!-- LogPrintProfiler 클래스에 Component 애노테이션을 주었음 -->
 	</aop:config>
 
