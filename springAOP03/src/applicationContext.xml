@@ -13,7 +13,7 @@
 	<context:component-scan base-package="aop"></context:component-scan>
 	
 	<aop:config><!-- AOP 설정하는 태그 -->
-		<aop:aspect id="traceAspect" ref="logPrintProfiler"><!-- aspect 설정하겠다.(공통기능) -->
+		<aop:aspect id="traceAspect" ref="logPrintProfiler"><!-- Aspect 설정하겠다.(공통기능) logPrintProfiler 빈 객체를 traceAspect 이름으로 -->
 			<!-- p250~p252 AspectJ의 Pointcut 표현식 -->
 			<!-- execution(수식어패턴? 리턴타입패턴 클래스이름패턴?메서드이름패턴(파라미터패턴)  (?는 1번 와도 되고 안와도 된다는 뜻 )-->
 			<!-- 
@@ -31,7 +31,7 @@
 				(*,*) 매개변수는 상관없다.
 			 -->
 			 <!-- Around Advice로 사용할 메서드 / pointcut="AspectJ문법 pointcut 설정"-->
-			<aop:around method="trace" pointcut="execution(public * aop..*.*(*,*))"/>
+			<aop:around method="trace" pointcut="execution(public * aop..*.*(*,*))"/><!-- logPrintProfiler Aspect의 trace() 메서드 사용 -->
 		</aop:aspect><!-- LogPrintProfiler 클래스에 Component 애노테이션을 주었음 -->
 	</aop:config>
 

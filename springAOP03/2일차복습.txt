@@ -1,0 +1,55 @@
+[DI04 코딩 설명]
+	- 스프링의 핵심 기능 2가지 DI와 AOP
+
+	- 스프링 DI (의존성 주입)
+		ㄴ 스프링에서 객체는 빈 객체 (따로 생성 + 조립하지 않음!)
+		ㄴ 스프링 빈 생성 + 조립 = 스프링 컨테이너(DI 컨테이너, IOC 컨테이너)
+		
+		[과거]
+		Car car1 = new Car(engine) ->  이렇게 주입안하고 생성자 의존성 주입
+		Engine engine = new Engine() X
+		Car 클래스는 Engine 클래스를 의존한다.
+		car1.setEngine(engine) -> 프로퍼티 의존성 주입
+		
+		[스프링]
+		(applicationContext.xml)
+		<bean id="car1" class="Car">
+			<property name="engine" ref="engine">
+		</bean>
+		<bean id="engine" class="Engine"></bean>
+
+		스프링 컨테이너를 생성(설정하는 방법에 따라 종류 5가지)
+		GenericXmlApplicationContext ctx = new GenericXmlApplicationContext("applicationContext.xml");
+		
+		Car mycar = ctx.getBean("car1", Car.class);
+		Car mycar = (Car)ctx.getBean("car1");
+		
+		컴포넌트 스캔은 <bean id="car1" class="Car"> 이렇게 하나하나 빈 객체를 생성하지않고
+		@Component 애노테이션을 붙이면 자동으로 빈 객체를 생성해줌
+		xml에 <context:component-scan base-package="패키지명"> 태그를 사용해서 검색할 패키지 명을 지정 필요 / 전처리기 모두 생성
+		설정하는 <beans> 태그는 버전이 맞아야함
+		<property name="engine" ref="engine"> DI(의존성 주입)해주는 것은
+		Car 클래스 안에 Engine 필드나 생성장, 프로퍼티 중 하나에 @Autowired 애노테이션 추가
+
+[AOP03 코딩 설명]		
+	- 스프링 AOP
+		글쓰기, 글수정, 글삭제는 로그인 했을 때만 가능하다
+		여기서 핵심 기능은 글쓰기, 글수정, 글삭제 / 공통 기능은 로그인(인증)
+		
+		Aspect(관점) Oriented Programming == AOP
+		관점에 따라서 공통을 매번 코딩하지말고 분리해서 코딩하자!
+		
+		AOP 구현하는 방법 3가지
+		1) 스프링 API - springAOP02, AOP02_02
+		2) XML 스키만 기반의 POJO 클래스를 이용한 구현 - springAOP03
+		3) @Aspect 애노테이션 사용
+		
+		스프링 AOP : 프록시 + 메서드 호출
+		Pointcut
+		어떤 메서드
+		
+		Pointcut 지정할 때 사용하는 표기법(문법) = AspectJ 표기법
+		
+		LogPrintProfier 클래스 생성하고 컴포넌트 스캔으로 빈 객체 생성
+	
+		
