@@ -9,6 +9,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<title>index</title>
 		<link href="../css/customer.css" type="text/css" rel="stylesheet" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 	</head>
 	<body>
 		<div id="header">
@@ -125,9 +126,17 @@
 						<div class="article-content" >${notice.content }</div>
 					</div>
 					<p class="article-comment margin-small">
-						<a class="btn-list button" href="notice.htm">목록</a>						
-						<a class="btn-edit button" href="noticeEdit.htm">수정</a>
-						<a class="btn-del button" href="noticeDel.htm">삭제</a>
+						<a class="btn-list button" href="notice.htm">목록</a>
+						<!-- 스크립트 코딩으로도 할 수 있음 -->						
+						<a class="btn-edit button" href="noticeEdit.htm?seq=${notice.seq }">수정</a>
+						<a class="btn-del button" href="noticeDel.htm?seq=${notice.seq }">삭제</a>
+						<script>
+						$(".btn-del.button").on("click", function (event) {
+							if(!window.confirm("정말 삭제할까요?")){
+								event.preventDefault();
+							}
+						});
+						</script>
 					</p>
 					<div class="margin-small" style="border-top: 1px solid #dfdfdf;">
 						<dl class="article-detail-row">

@@ -1,0 +1,36 @@
+-- 공지사항
+CREATE TABLE NOTICES
+(
+	"SEQ" VARCHAR2(10 BYTE), --글번호
+	"TITLE" VARCHAR2(200 BYTE), --제목
+	"WRITER" VARCHAR2(50 BYTE), --작성자
+	"CONTENT" VARCHAR2(4000 BYTE), --내용
+	"REGDATE" TIMESTAMP (6), --작성일
+	"HIT" NUMBER, --조회수
+	"FILESRC" VARCHAR2(500 BYTE)-- 첨부파일
+);
+
+-- 회원테이블
+CREATE TABLE "MEMBER"
+(	
+    "ID" VARCHAR2(50 BYTE), -- 회원ID(원래 UID인데 수정함)
+    "PWD" VARCHAR2(50 BYTE), -- 비밀번호
+    "NAME" VARCHAR2(50 BYTE), -- 이름
+    "GENDER" VARCHAR2(10 BYTE), --성별
+    "BIRTH" VARCHAR2(10 BYTE), --생일
+    "IS_LUNAR" VARCHAR2(10 BYTE),  --양력,음력판단
+    "CPHONE" VARCHAR2(15 BYTE),  --휴대폰번호
+    "EMAIL" VARCHAR2(200 BYTE), --이메일
+    "HABIT" VARCHAR2(200 BYTE), --취미
+    "REGDATE" DATE --가입일
+);
+
+INSERT INTO NOTICES
+  ( SEQ, TITLE, CONTENT, WRITER, REGDATE, HIT, FILESRC)  
+ VALUES 
+ (  1 , '첫 번째 공지사항', '내용 무', 'yaliny', SYSDATE, 0, null );
+ 
+ commit;
+ 
+ SELECT *
+ FROM NOTICES;

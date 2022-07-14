@@ -9,7 +9,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
-<h3>index.jsp</h3>
+<h3>설명20220713.jsp</h3>
 <pre>
 1. JSP/Servlet MVC 패턴
 	1) MV[C] 컨트롤러 선언 DispatcherServlet.java == 서블릿
