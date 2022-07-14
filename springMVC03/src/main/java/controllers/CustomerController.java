@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import newlecture.dao.NoticeDao;
 import newlecture.vo.Notice;
@@ -81,7 +82,7 @@ public class CustomerController {
 		return "noticeReg.jsp";
 	} // noticeReg
 	
-	// [2]
+	// [3]
 	// noticeReg.htm 요청이 POST 방식으로 요청을 하면 해당 컨트롤러 메서드 실행
 	@RequestMapping(value = {"noticeReg.htm"}, method = RequestMethod.POST)
 	public String noticeReg(Notice notice) throws Exception{ // 커맨드 객체
@@ -98,7 +99,7 @@ public class CustomerController {
 	} // noticeReg
 	
 	/*
-	// [1]
+	// [2]
 	// noticeReg.htm 요청이 POST 방식으로 요청을 하면 해당 컨트롤러 메서드 실행
 	@RequestMapping(value = {"noticeReg.htm"}, method = RequestMethod.POST)
 	public String noticeReg(String title, String content) throws Exception{
@@ -196,7 +197,7 @@ public class CustomerController {
 	*/
 	
 	/*
-	[1]
+	// [1]
 	// 공지사항 목록을 가져오는 [컨트롤러 메서드] <- NoticeController.java 클래스가 메서드로 전이
 	// @RequestMapping("/customer/notice.htm")
 	@RequestMapping("notice.htm")
@@ -229,7 +230,6 @@ public class CustomerController {
 	// [2]	
 	// p356 컨트롤러 메서드의 파라미터 타입 + 리턴 타입
 	@RequestMapping(value="noticeDetail.htm")
-	// @RequestMapping(value = {"noticeDetail.htm"}, method = RequestMethod.GET)
 	public String noticeDetail(HttpServletRequest request, HttpServletResponse response
 			, Model model, HttpSession session
 			, String seq // ?seq=1
@@ -249,7 +249,7 @@ public class CustomerController {
 	}
 	
 	/*
-	[1]
+	// [1]
 	// 공지사항 상세보기하는 컨트롤러 메서드 <- NoticeDetailController.java 클래스가 메서드로 전이
 	// @RequestMapping(value="/customer/noticeDetail.htm")
 	@RequestMapping(value="noticeDetail.htm")
