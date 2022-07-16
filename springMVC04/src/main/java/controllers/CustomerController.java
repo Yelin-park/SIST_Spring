@@ -94,7 +94,7 @@ public class CustomerController {
 		}
 
 		/*
-		// [1] 첨부파일을 select로 알아왔다.
+		// [1] 첨부파일을 DAO의 select 메서드로 알아왔다.
 		Notice notice = this.noticeDao.getNotice(seq);
 		String filesrc = notice.getFilesrc(); // 첨부된 파일 명을 가져옴
 		if(filesrc != null) {
@@ -212,7 +212,6 @@ public class CustomerController {
 
 			if(!f.exists()) return originalFilename; // 파일이 존재하지 않으면 그 파일 이름 그대로 저장
 
-			// Q. 파일 확장자 이름이 .txt라고 꼭 4자리일까? 
 			// upload 폴더에 originalFilename 이름으로 파일이 존재하면
 			// a.txt => a_1.txt 또는 a(1).txt 변환
 			String fileName = originalFilename.substring(0, originalFilename.length() - 4); // 파일명

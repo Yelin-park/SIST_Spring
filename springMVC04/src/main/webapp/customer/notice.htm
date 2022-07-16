@@ -13,8 +13,8 @@ JSP days11 수업 참고
 3. MultipartResover 스프링 빈으로 등록 - dispatcher-servlet.xml 설정 파일에
 
 3-2. MultipartResover 스프링 빈으로 등록 방법 2가지
-	ㄱ. CommonMultipartResolver - Commons FileUpload API 이용해서 데이터 처리 ***
-	ㄴ. StandardServeltmultipartResolver - 서블릿 3.0의 Part 이용해서 데이터 처리
+	ㄱ. CommonsMultipartResolver - Commons FileUpload API 이용해서 데이터 처리 ***
+	ㄴ. StandardServeltMultipartResolver - 서블릿 3.0의 Part 이용해서 데이터 처리
 	
 3-3. 반드시 주의할 점
 	위 두 MultipartResover 구현체 중 하나를 스프링 빈으로 등록할 때 주의할 점은
@@ -34,7 +34,7 @@ JSP days11 수업 참고
                      첨부된 파일 유무 -  multiparFile.tansferTo( 파일 객체 );
                }
                
-     ㄴ. @RequestParam 어노트페이션을 이용 p442
+     ㄴ. @RequestParam 애노테이션을 이용 p442
              <input type="file" name="f">
              @RequestMapping()
                public String upload( @ReqeustParam("f")  MultiparFile multiparFile  ){
@@ -53,9 +53,11 @@ JSP days11 수업 참고
 	***ㄹ.커맨드 객체를 통해 업로드 파일 접근. *** p445       
                1) Notice.java
                <input type="file" id="txtFile" name="file" />   
-               ublic String noticeReg(  Notice notice )
+               public String noticeReg(  Notice notice )
+               
                2) 필드 추가
                private CommonsMultipartFile file;
+               
                3) MultipartFile 인터페이스 주요 메서드
                   ㄱ. String getName()                     파라미터 이름 
                   ㄴ. String getOriginalFilename() 업로드한 파일의 이름
