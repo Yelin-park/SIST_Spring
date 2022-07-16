@@ -1,7 +1,144 @@
-[springMVC03 프로젝트]
+[springMVC04 프로젝트]
 /customer/notice.htm
-		 
-MemberDao 모든 메서드를 Jdbc템플릿으로 수정
+
+[JSP 파일 업로드]
+1. method='post' 설정
+2. 인코딩 설정 enctype="multipart/form-data"
+JSP days11 수업 참고
+
+[스프링 파일 업로드] p438
+1. form 태그 method='post' 설정
+2. form 태그 enctype="multipart/form-data" 설정
+
+3. MultipartResover 스프링 빈으로 등록 - dispatcher-servlet.xml 설정 파일에
+
+3-2. MultipartResover 스프링 빈으로 등록 방법 2가지
+	ㄱ. CommonMultipartResolver - Commons FileUpload API 이용해서 데이터 처리 ***
+	ㄴ. StandardServeltmultipartResolver - 서블릿 3.0의 Part 이용해서 데이터 처리
+	
+3-3. 반드시 주의할 점
+	위 두 MultipartResover 구현체 중 하나를 스프링 빈으로 등록할 때 주의할 점은
+	스프링 빈의 이름은 MultipartResover이어야 한다.
+	DispatcherServlet은 이름이 MultipartResover인 빈을 사용하기 때문에 다른 이름을 사용할 경우 MultipartResover로 사용되지 않는다.
+	
+4. WEB-INF/lib 폴더에 모듈 추가
+	ㄱ. com.springsource.org.apache.commons.fileupload-1.2.0.jar
+	ㄴ. com.springsource.org.apache.commons.io-1.4.0.jar
+
+5. 실제 업로드된 파일 접근해서 저장하는 방법(5가지) p441
+	ㄱ. MultiparFile 인터페이스 이용
+               컨트롤러 메서드 
+               @RequestMapping()
+               public String upload( MultiparFile multiparFile  ){
+                    File 파일객체 = new File(파일경로);
+                     첨부된 파일 유무 -  multiparFile.tansferTo( 파일 객체 );
+               }
+               
+     ㄴ. @RequestParam 어노트페이션을 이용 p442
+             <input type="file" name="f">
+             @RequestMapping()
+               public String upload( @ReqeustParam("f")  MultiparFile multiparFile  ){
+                    File 파일객체 = new File(파일경로);
+                     첨부된 파일 유무 -  multiparFile.tansferTo( 파일 객체 );
+               }
+               
+	ㄷ. Multipart[HttpServerRequest]을 이용 p443
+         @RequestMapping()
+               public String upload(  Multipart[HttpServerRequest] mrequest ){
+                     MutipartFile  mfile = mrequest.getFile("f");
+                     File 파일객체 = new File(파일경로);
+                     첨부된 파일 유무 -  mfile.tansferTo( 파일 객체 );
+               }
+               
+	***ㄹ.커맨드 객체를 통해 업로드 파일 접근. *** p445       
+               1) Notice.java
+               <input type="file" id="txtFile" name="file" />   
+               ublic String noticeReg(  Notice notice )
+               2) 필드 추가
+               private CommonsMultipartFile file;
+               3) MultipartFile 인터페이스 주요 메서드
+                  ㄱ. String getName()                     파라미터 이름 
+                  ㄴ. String getOriginalFilename() 업로드한 파일의 이름
+                  ㄷ. boolean isEmpty()                       업로드한 파일 존재 유무
+                  ㄹ. long getSize()                            업로드한 파일 크기
+                  ㅁ. byte [] getBytes()                    업로드한 파일의 바이트 데이트
+                  ㅂ. InputStream getInputStream()  업로드한 파일의 읽기 스트림 객체 반환
+                  ㅅ. transferTo( File )                       업로드한 파일을 저장 
+         
+	ㅁ. 서블릿 3.0의 Part 이용
+         @RequestMapping()
+               public String upload(   @ReqeustParam("f") Part part ){
+               }
+
+---------------------------------------------------------------
+실제 구현하기
+[공지사항 쓰기] noticeReg.jsp + 첨부파일
+
+1. noticeReg.jsp 확인
+	ㄴ form 태그 인코딩 설정 enctype="multipart/form-data"
+	ㄴ <input type="file" id="txtFile" name="file" />
+	
+2. Notice.java - VO 확인	
+	커맨드 객체를 통해서 파일 업로드 처리를 하기 위한 필드가 필요
+	<input type="file" id="txtFile" name="file" /> 인풋태그의 name 속성 값과 필드 이름을 동일하게 해주어야함(주의)
+	private CommonsMultipartFile file;
+	
+	public CommonsMultipartFile getFile() {
+		return file;
+	}
+	
+	public void setFile(CommonsMultipartFile file) {
+		this.file = file;
+	}
+
+3. 저장 경로는
+	customer
+		ㄴ upload 폴더 추가
+		
+[무한로딩원인]
+while문 안에 ! 빠졌고
+500 에러 발생 - upload 폴더가 서버 배포 경로에 생성이 되지 않아서 발생 -> 직접 폴더 생성하기
+
+
+4. noticeDetail.jsp 수정
+5. 공지사항 삭제 + 첨부파일 제거하는 코딩 추가
+6. noticeEdit.htm 수정할 때 첨부파일 O, X
+
+첨부파일 여러 개 
+---------------------------------------------------------------
+다시 전체적인 과정 설명
+noticeReg.jsp
+		인풋 태그의 name 속성들
+제목 : title
+파일 : file 첨부파일
+내용 : content
+	[ 저장 ]
+	
+=> 서버에서 첨부 파일을 받아서 내가 원하는 경로에 저장하는 것이 업로드
+	ㄴ> 스프링 프레임웤에서 업로드
+1. form 태그의 method=post, entype=multipart...
+
+JSP의 MultipartRequest 객체와 같은것..
+바이너리(바이트)로 날아옴 0101010101 
+2. 스트링 형태로 서버에 날아오기 때문에
+	스프링에서 그것을 받아서 파일로 저장하기 위해서는 dispatcher-servlet.xml 파일에 MultipartResover 라는 빈 객체를 생성해야함
+		ㄴ> 스프링에서 첨부된 파일을 처리하기 위해서 꼭 필요한 빈 객체
+	MultipartResover에는 2가지가 있음 그 중에 CMR 사용
+
+3. 컨트롤러 메서드 + 첨부된 파일 처리 코딩 => 5가지 방법이 있고
+	그 중에서 커맨드 객체를 사용하여 처리하는 방법 사용
+	
+	첨부된 파일을 사용하기 위해선 Notice.java(VO)에는 private CommonsMultipartFile file 필드가 필요
+	
+	noticeReg(Notice notice) {
+		notice.getFile(); // 파일 이름, 크기, 정보
+		.transferTo(file) 내가 원하는 경로인 /customer/upload 폴더 + 파일명 으로 파일 경로 저장
+		notice.setFilesrc(fliesystemname); // DB에 filesrc 값을 저장해야하니까
+		
+		dao.insert(notice);
+		return "~~~.jsp";
+	}		 
+
 	
 	
 	
