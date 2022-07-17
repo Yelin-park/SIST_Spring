@@ -15,6 +15,9 @@ import newlecture.vo.Notice;
 @Repository // 자동으로 스캔이 되는 대상인데 DAO이다. 이름은 noticeDao로 잡힘
 public class NoticeDao {
 	
+	@Autowired // 자동으로 주입
+	private JdbcTemplate jdbcTemplate;
+	
 	// 검색한 결과의 총레코드 수를 반환하는 메서드
 	public int getCount(String field, String query) throws ClassNotFoundException, SQLException {
 		String sql = "SELECT COUNT(*) "
@@ -25,9 +28,6 @@ public class NoticeDao {
 		return this.jdbcTemplate.queryForInt(sql, new Object[] {"%"+query+"%"});
 		
 	} // getCount
-	
-	@Autowired // 자동으로 주입
-	private JdbcTemplate jdbcTemplate;
 	
 	// 공지사항 페이징 처리하여 목록 가져오는 메서드(jdbcTemplate 사용)
 	public List<Notice> getNotices(int page, String field, String query) throws ClassNotFoundException, SQLException {					
@@ -49,7 +49,7 @@ public class NoticeDao {
 
 		// 주의! 테이블의 컬럼명과 Notice DTO의 필드명이 반드시 일치해야된다. (일치안하면 가공해야됨)
 		List<Notice> list = this.jdbcTemplate.query(sql
-								, new Object[] {"%"+query+"%", srow, erow} // 2번째 매개변수는 ?, ?, ? 물음표에 해당하는 값을 줌 
+								, new Object[] {"%"+query+"%", srow, erow} // 2번째 매개변수 Object[]는 ?, ?, ? 물음표에 해당하는 값을 줌 
 								, new BeanPropertyRowMapper<Notice>(Notice.class)
 								);
 		return list;
@@ -86,7 +86,7 @@ public class NoticeDao {
 		 Notice notice =  this.jdbcTemplate.queryForObject(
 				 sql
                  , new Object[] { seq }
-                 , ParameterizedBeanPropertyRowMapper.newInstance(Notice.class) 
+                 , ParameterizedBeanPropertyRowMapper.newInstance(Notice.class)
                  );
 		 
 		return notice;
@@ -98,7 +98,7 @@ public class NoticeDao {
 		String sql = "INSERT INTO "
 					+ "NOTICES(SEQ, TITLE, CONTENT, WRITER, REGDATE, HIT, FILESRC) "
 					+ "VALUES("
-					+ "			(SELECT MAX(TO_NUMBER(SEQ))+1 FROM NOTICES), ?, ?, ?, SYSDATE, 0, ?)"; // 글쓴이는 yaliny
+					+ "			(SELECT MAX(TO_NUMBER(SEQ))+1 FROM NOTICES), ?, ?, ?, SYSDATE, 0, ?)";
 		
 		return this.jdbcTemplate.update(sql, notice.getTitle(), notice.getContent(), notice.getWriter(), notice.getFilesrc());
 		
