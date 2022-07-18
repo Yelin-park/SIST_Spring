@@ -1,0 +1,28 @@
+[springTransaction02 프로젝트]
+/customer/notice.htm
+
+1. 스프링 트랜잭션 처리 3가지 방법
+	1) 코드 기반 처리 : 개발자 직접 코딩, 트랜잭션 매니저, 트랜잭션 템플릿 클래스 이용 *** 
+		ㄴ> 02 프로젝트는 코드 기반 처리로 트랜잭션 처리!
+		
+	2) 선언적 트랜잭션 처리 방법 - xml 설정
+	3) 어노테이션 기반
+	
+	[dispatcher-service.xml]
+	ㄱ. transactionManager 빈 등록 : 스프링 트랜잭션 처리 관리자
+	
+	ㄴ. 트랙재션을 처리하는 템플릿 등록
+	 <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+  		<property name="transactionManager" ref="transactionManager"></property>
+ 	 </bean>
+ 	 
+ 	p514
+ 	ㄷ. 트랜잭션 처리가 필요한 장소(메서드) ?
+ 		insertAndPointUpOfMember
+ 	
+ 	TEST 4 공지사항 INSERT o, point 2
+ 	TEST 5 공지사항 INSERT x, poin 2 => 트랜잭션 처리 완료!
+		
+ 	
+
+	
