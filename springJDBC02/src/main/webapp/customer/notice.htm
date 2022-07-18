@@ -15,7 +15,7 @@ p496 NamedParameterJdbcTemplate 클래스를 이용한 JDBC 프로그래밍
 					
 		String sql = "SELECT COUNT(*) "
 					+ "CNT FROM NOTICES "
-					+ "WHERE " + field + "LIKE=" 파라미터 이름;
+					+ "WHERE " + field + "LIKE= :파라미터이름";
 
 dispatcher-servlet.xml에
 	ㄴ NamedParameterJdbcTemplate 스프링 빈으로 등록
@@ -55,7 +55,7 @@ org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate.<init>()
 
 1. DAO 클래스들을 인터페이스 선언
 	MeberDAO.java를 복붙해서 NLMemberDao.java
-	NoticeDAO.java도 NLNotice.java		
+	NoticeDAO.java도 NLNoticeDao.java		
 	DAO 메서드 수정
 	
 -----------

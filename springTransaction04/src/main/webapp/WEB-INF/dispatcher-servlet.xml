@@ -29,8 +29,7 @@ https://www.springframework.org/schema/aop/spring-aop-3.0.xsd
 <!-- @Transactional 애노테이션 사용한 트랜잭션 처리 -->
 	<tx:annotation-driven transaction-manager="transactionManager"
 	mode="proxy"
-	proxy-target-class="false"
-	/>
+	proxy-target-class="false"/>
 
  
 </beans>

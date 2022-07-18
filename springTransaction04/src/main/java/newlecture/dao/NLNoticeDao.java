@@ -29,10 +29,6 @@ public class NLNoticeDao implements NoticeDao{
 	@Autowired // 자동으로 주입
 	private NamedParameterJdbcTemplate jdbcTemplate; // ***
 	
-	// 트랜잭선 템플릿 주입 받음
-	@Autowired
-	private TransactionTemplate transactionTemplate;
-	
 	// 검색한 결과의 총레코드 수를 반환하는 메서드
 	@Override
 	public int getCount(String field, String query) throws ClassNotFoundException, SQLException {

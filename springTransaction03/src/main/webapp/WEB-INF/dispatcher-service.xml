@@ -25,6 +25,7 @@
      <constructor-arg ref="dataSource"></constructor-arg>
   </bean>
 
+
 <!-- p507 스프링 트랜잭션을 처리할 트랜잭션 매니저 등록 -->
  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
   <property name="dataSource" ref="dataSource"></property>

@@ -182,10 +182,7 @@ public class NLNoticeDao implements NoticeDao{
 				parameterSource2.addValue("id", id);
 				jdbcTemplate.update(sql2, parameterSource2);
 			}
-		});
-		
-
-		
+		});	
 		
 	} // insertAndPointUpOfMember
 
