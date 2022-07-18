@@ -1,0 +1,104 @@
+[springTransaction 프로젝트] -> NamedParameterJdbcTemplate 사용해서 코딩 수정
+/customer/notice.htm
+
+1. index.jsp == 메인페이지
+	webapp에 index.htm 생성
+	index.htm 요청 -> HomeController.java 생성 후 컨트롤러 메서드 구현
+	
+2. joinus/join.jsp - 회원가입
+   joinus/logon.jsp - 로그인
+   
+   JoinController.java 생성 후 컨트롤러 메서드 구현
+
+
+p505 Chapter12 스프링 트랜잭션 관리		 
+p505 ~ p 536 정독
+
+1. 트랜잭션? 하나의 논리적인 작업 단위가 모두 성공(Commit) / 실패(Rollback) 
+	계좌이체 생각하기
+	A 출금 -> B 입금 X : 말도 안되는 소리~
+	
+2. p506 트랜잭션의 4가지 특징(ACID)
+	원자성, 일관성, 고립성, 지속성
+	
+3. p507 스프링 트랜잭션 처리 지원
+	1) 코드 기반 트랜잭션 처리
+	2) 선언적 트랜잭션 처리
+	
+4. 개발자가 직접 스프링의 트랜잭션 처리할 수 있는 템플릿(스프링 트랜잭션 템플릿)을 사용해서 처리할 수 있다.
+	
+		아래와 같이 트랜잭션 처리하는 형식이 있음
+		오라클 ex)
+			DECLARE
+			BEGIN
+				insert
+				update
+				delete
+				select
+				commit;
+			EXCEPTION
+				rollback;
+			END;
+		
+		자바 ex)
+			try{
+				insert
+				update
+				delete
+				
+				commit
+			}catch(){
+				rollback;
+			}
+			
+5. p507 스프링에서 트랜잭션 처리를 하기 위해 TransactionManager 인터페이스를 구현한
+ 	클래스를 트랜잭션 처리 관리자로 빈 등록을 해야한다.
+ 	
+ 	트랜잭션 처리도 DB와 관련되어 있음 -> dispatcher-service.xml 등록
+
+6. 스프링 트랜잭션 처리 3가지 방법
+	1) 코드 기반 처리 : 개발자 직접 코딩, 트랜잭션 매니저, 트랜잭션 템플릿 클래스 이용 ***
+	2) 선언적 트랜잭션 처리 방법 - xml 설정
+	3) 어노테이션 기반 - @어노테이션 ***
+
+7. 트랜잭션 처리 실습(트랜잭선 처리가 안되었을 때)
+	1) 공지사항 새 글 작성 + 새 글을 작성한 회원의 point 1 증가
+		ㄴ notice 테이블 insert 작업			ㄴ member 테이블의 point 컬럼의 값을 1 증가 update
+	 * member 테이블에 point 컬럼이 없어서 추가
+	 	ALTER TABLE member
+		ADD (point number(10) default(0));
+	
+	2) point 컬럼 값은 3을 넘길 수 없도록 체크제약조건 설정 (일부러 오류를 내고 트랜잭션 처리를 하기 위해서)
+		ALTER TABLE member
+		ADD CONSTRAINT ck_member_point CHECK(point < 3);
+	
+	3) notice 테이블에 seq PRIMARY KEY 제약조건 설정
+		ALTER TABLE notices
+		ADD CONSTRAINT pk_notices_seq PRIMARY KEY(seq);
+	
+	4) notice 테이블의 title 컬럼 값은 unique 제약 조건(유일성)
+		ALTER TABLE notices
+		ADD CONSTRAINT uk_notices_title UNIQUE(title);
+		
+	5) Member 클래스 + point 필드와 get/set 추가
+	
+	6) 우선 체크할 것
+		새글(insert) + 작성자의 point 컬럼 1증가(update) 작업을 
+		트랜잭션 처리가 안된 상태인 경우를 체크
+		
+		ㄱ. NoticeDao 인터페이스
+			public int insertAndPointUpOfMember(Notice notice, String id); 추가
+			
+		ㄴ. NLNoticeDao.java에서
+			insertAndPointUpOfMember() 메서드 오버라이딩
+			
+		ㄷ. CustomerController.java의 noticeReg() 메서드 수정
+
+	7) notice.htm 실행 후 확인
+		TEST 1 공지사항 INSERT o POINT 1
+		TEST 2 공지사항 INSERT o POINT 2
+		TEST 3 공지사항 INSERT o POINT 2 => 오류 발생(체크 제약조건 때문에 UPDATE 처리는 에러 발생)
+		
+ 	
+
+	

@@ -32,4 +32,7 @@ public interface NoticeDao {
 	// 공지사항 추가하는 메서드
 	public int insert(Notice notice) throws ClassNotFoundException, SQLException;
 	
+	// 트랜잭션 테스트 용도의 추상 메서드 추가
+	public void insertAndPointUpOfMember(Notice notice, String id) throws ClassNotFoundException, SQLException;
+	
 } // class

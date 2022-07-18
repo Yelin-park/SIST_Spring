@@ -1,4 +1,127 @@
-[springJDBC 프로젝트]
+[springJDBC02 프로젝트] -> NamedParameterJdbcTemplate 사용해서 코딩 수정
 /customer/notice.htm
 		 
-MemberDao 모든 메서드를 Jdbc템플릿으로 수정	
+> Spring JDBC 정리 <
+https://velog.io/@gisung/Spring.-Spring-JDBC-%EC%82%AC%EC%9A%A9%EB%B2%95
+
+p496 NamedParameterJdbcTemplate 클래스를 이용한 JDBC 프로그래밍
+	jdbcTemplate와 동일한 기능을 제공하는데 차이점은 인덱스 기반의 파라미터가 아니라 이름 기반의 파라미터를 설정!
+	?, ? 대신 :이름, :이름 사용
+	쿼리에 ?가 많은 경우에는 NamedParameterJdbcTemplate을 사용하도록 권장한다.
+
+		String sql = "SELECT COUNT(*) "
+					+ "CNT FROM NOTICES "
+					+ "WHERE " + field + " LIKE=?";
+					
+		String sql = "SELECT COUNT(*) "
+					+ "CNT FROM NOTICES "
+					+ "WHERE " + field + "LIKE=" 파라미터 이름;
+
+dispatcher-servlet.xml에
+	ㄴ NamedParameterJdbcTemplate 스프링 빈으로 등록
+	
+[예외 발생]
+org.springframework.beans.factory.BeanCreationException: NLNoticeDao 스프링 빈 객체를 생성하다가 예외 발생
+Error creating bean with name 'NLNoticeDao':  @Repository로 인하여 컴포넌트 스캔될 때 자동으로 빈 생성
+Injection of autowired dependencies failed; @Autowired로 자동으로 의존 주입할 때 실패했다. 
+nested exception is org.springframework.beans.factory.BeanCreationException:
+Could not autowire field: private org.springframework.jdbc.core.JdbcTemplate newlecture.dao.NLNoticeDao.jdbcTemplate;
+nested exception is org.springframework.beans.factory.NoSuchBeanDefinitionException:
+No matching bean of type [org.springframework.jdbc.core.JdbcTemplate] found for dependency:
+expected at least 1 bean which qualifies as autowire candidate for this dependency.
+Dependency annotations: {@org.springframework.beans.factory.annotation.Autowired(required=true)}
+
+> 해결 : @Autowired를 NamedParameterJdbcTemplate로 변경
+
+[예외 발생]
+org.springframework.beans.factory.BeanCreationException:
+Error creating bean with name 'NLNoticeDao':
+Injection of autowired dependencies failed;
+nested exception is org.springframework.beans.factory.BeanCreationException:
+Could not autowire field:
+private org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate newlecture.dao.NLNoticeDao.jdbcTemplate;
+nested exception is org.springframework.beans.factory.BeanCreationException:
+Error creating bean with name 'jdbcTemplate' defined in ServletContext resource [/WEB-INF/dispatcher-servlet.xml]:
+Instantiation of bean failed; nested exception is org.springframework.beans.BeanInstantiationException:
+Could not instantiate bean class [org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate]:
+No default constructor found; nested exception is java.lang.NoSuchMethodException:
+org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate.<init>()					
+
+> 해결 : 
+	NamedParameterJdbcTemplate 클래스 안에 setDataSource () 메서드가 없음
+	NamedParameterJdbcTemplate jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+	생성자로 dataSource를 주입시켜줌					
+----
+
+1. DAO 클래스들을 인터페이스 선언
+	MeberDAO.java를 복붙해서 NLMemberDao.java
+	NoticeDAO.java도 NLNotice.java		
+	DAO 메서드 수정
+	
+-----------
+
+[p120 스프링 컨테이너의 추가 설명]
+
+	1) 스프링 컨테이너 ? 스프링 빈 객체를 생성 + 조립하는 공장
+		dispatcher-servlet.xml 설정 파일을 보고 스프링 빈 객체를 생성하고 조립을 함
+
+	2) web.xml
+		  <servlet>
+		  	<servlet-name>dispatcher</servlet-name>
+		  	<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		  	<load-on-startup>1</load-on-startup><!-- 모든 요청을 받는 단 하나의 서블릿 -->
+		  </servlet>
+		  <servlet-mapping>
+		  	<servlet-name>dispatcher</servlet-name>
+		  	<url-pattern>*.htm</url-pattern>
+		  </servlet-mapping>
+		
+	3) 관리를 목적으로 프론트 컨트롤러를 여러 개 등록한다.
+						 스프링 MV[C] : fornt controller 등록 -> 이 front controller의 서블릿이름-servlet.xml 따로 있음
+		ajax 요청만 받는  - 스프링 MV[C] : fornt controller 등록 -> 이 front controller의 서블릿이름-servlet.xml 따로 있음
+		관리자 요청만 받는 - 스프링 MV[C] : fornt controller 등록 -> 이 front controller의 서블릿이름-servlet.xml 따로 있음
+					:
+			 여러 개.. 등록
+		
+	 각 공장은 스프링 빈 객체를 공유할 수 없음 
+		공통적으로 사용할 스프링 빈 객체가 있다면
+				[X] 공장 [b1, b2]
+		X 공장에서 공통적으로 사용할 스프링 빈 객체를 어떻게 공유하는가?
+		[A] 공장       [B] 공장
+
+[p124 스프링 컨테이너 계층 구조(부모-자식 계층)]
+	4)
+		부모 컨테이너(공장) - 빈
+		↓				↓
+자식 컨테이너1		자식 컨테이너2		앞으로 자식 컨테이너3 자식 컨테이너4 늘어날 수 있음
+ > 부모 컨테이너의 빈 객체를 사용할 수 있음
+ 
+  	ex. 부모 공장(빈) - DB 연동할 때 사용하는 스프링 빈 생성
+ 		자식 공장에서 가져다 사용
+ 
+ 	5) 실습
+ 	front controller 1개
+ 	dispatcher-servlet.xml => 선언된 빈 객체들 중에 DB 연동할 때 사용하는 스프링 빈은 부모 컨테이너(Application Context)에서 생성하도록 코딩
+ 	
+ 	dispatcher-service.xml 
+ 	
+ 	> 실행하면 예외 발생
+ 	 톰캣이 실행할 때 web.xml 설정으로 인해서 서블릿 객체가 생성(WebApplicationContext 공장 : 서블릿명-servlet.xml을 찾음)
+ 	 dispatcher-servlet.xml은 올라가지만
+ 	 dispatcher-service.xml은 올라가지 않음 -> 설정을 해주어야 함
+ 	 
+[p371 WebApplicationContext 계층]
+	DispatcherServlet은 그 자체가 서블릿이기 때문에 한 개 이상의 DispatcherServlet 설정하는 것이 가능하다. (여러 개 선언 가능)
+	DispatcherServlet 따로 만들면 각각 별도의 WebApplicationContext 생성 - 빈 객체는 공유할 수 없음
+
+	공통 빈을 필요로 하는 경우 ContextLoaderListener 사용하여 공통으로 사용될 빈을 설정할 수 있음 (p373)
+	ContextLoaderListener를 ServletLisener로 등록하고 contextConfigLocation 컨텍스트 파라미터를 이용하여
+	공통으로 사용될 빈 정보를 담고 있는 설정 파일 목록을 지정
+	
+	ContextLoaderListener 생성하는 WebApplicationContext는 루트 컨텍스트를 부모로 사용하는 자식 컨텍스트가 됨
+
+
+ 	 
+ 	
+
+	
