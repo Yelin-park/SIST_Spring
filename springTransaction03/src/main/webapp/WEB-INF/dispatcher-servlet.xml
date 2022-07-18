@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- tx와 aop 추가된 것 -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:p="http://www.springframework.org/schema/p"
+xmlns:context="http://www.springframework.org/schema/context"
+xmlns:aop="http://www.springframework.org/schema/aop" 
+               xmlns:tx="http://www.springframework.org/schema/tx"
+xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context-3.0.xsd
+http://www.springframework.org/schema/aop
+https://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+            http://www.springframework.org/schema/tx
+               http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+<!-- dispatcher-servlet.xml -->
+
+	<context:component-scan base-package="newlecture.dao, controllers"></context:component-scan>
+
+<!-- 이름이 반드시 multipartResolver 이어야함 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- p439 표9.2 CommonsMultipartResolver 클래스의 프로퍼티 -->
+		<property name="maxUploadSize" value="-1"></property>
+	</bean>
+	
+<!-- p522 선언적 트랜잭션 처리 방법 중 첫번째 tx:advice 선언 -->	
+	<tx:advice transaction-manager="transactionManager" id="txAdvice">
+		<tx:attributes>
+		<!-- 격리성 isolation -->
+		<!-- 전파성 propagation -->
+			<tx:method name="insertAndPointUpOfMember"
+			 isolation="DEFAULT" 
+			 propagation="REQUIRED"
+			 read-only="false"
+			 timeout="-1"/>
+		</tx:attributes>
+	</tx:advice>
+	
+	<aop:config>
+    	<aop:pointcut expression="execution(public void insertAndPointUpOfMember(*,*) )"  id="insertOrM"/>
+    	 <!-- within 명시자 / 만약에 newlecture.dao 패키지 안에 있은 모든 메서드를 트랜잭션 처리 -->
+    	 <aop:pointcut expression="within(newlecture.dao.*)"   id="insertPackage" /><!-- 지워도 상관없음 -->
+    	<aop:advisor advice-ref="txAdvice"  pointcut-ref="insertOrM"/>
+  	</aop:config>
+
+ 
+</beans>

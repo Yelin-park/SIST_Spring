@@ -1,0 +1,40 @@
+[springTransaction03 프로젝트]
+/customer/notice.htm
+
+1. 스프링 트랜잭션 처리 3가지 방법
+	1) 코드 기반 처리 : 개발자 직접 코딩, 트랜잭션 매니저, 트랜잭션 템플릿 클래스 이용 
+	2) 선언적 트랜잭션 처리 방법 - xml 설정
+	3) 어노테이션 기반
+		ㄴ> 04 프로젝트는 어노테이션 기반 트랜잭션 처리!
+	
+p524 [@Transactional 3) 어노테이션 기반]	
+	1번 작업
+	@Transactional
+	insertAndPointUpMethod(){
+	}
+
+	2번 작업	
+	dispatcher-servlet.xml
+	<tx:annotation-driven transaction-manager="transactionManager"/> 추가
+
+
+인터페이스 안에서 @Transactional 애노테이션을 선언해도 가능
+어떤 클래스 안에 있는 모든 메서드가 다 트랜잭션이 필요하다면 클래스 위에 @Transactional 선언
+		
+ 
+내일 수업
+전파방식 propagation
+격리레벌 isolation
+스프링 Tiles
+
+화
+STS + Maven 설명
+Spring Security
+
+수
+MyBatis
+
+현재 교재 4.0
+다른 교재로 4.X / 3.X / 5.X
+
+	
