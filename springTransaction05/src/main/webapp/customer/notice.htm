@@ -1,0 +1,92 @@
+[springTransaction05 프로젝트]
+/customer/notice.htm
+
+[ 스프링 트랜잭션 전파방식(propagation) ]
+
+1. 스프링에서의 전파방식이란?
+	- 트랜잭션 처리 과정 속에서 또 다른 트랜잭션을 처리해야 할 경우
+		@Transactional
+		insertAndPointUpMember(){
+			test();
+		}
+		
+		@Transactional
+		void test(){
+		}
+	
+		> 트랜잭션 처리하는 과정 속에 또 다른 함수를 호출하거나 또 다른 트랜잭션을 처리하는 경우에는 어떻게 할것인가?
+	  		하나가 롤백되면 다른 하나는 롤백할것인지? 아니면 어떻게 할 것인지?
+
+	- 중첩이 되는 트랜잭션 처리를 각각 독립적으로 어떻게 트랜잭션 처리를 할지 결정해 주는 것이 '전파방식(propagation)' 이다.
+
+	- p512 표12.1  
+	REQUIRED(기본값)
+		메서드를 수행하는데 트랜잭션이 필요하다는 것을 의미.
+		현재 진행 중인 트랜잭션이 존재하면, 해당 트랜잭션을 사용한다.(그 트랜잭션에 같이 묶임)
+		존재하지 않는다면 새로운 트랜잭션을 생성한다.
+	MANDATORY
+	REQUIRES_NEW
+		항상 새로운 트랜잭션을 시작한다.
+		기존 트랜잭션이 존재하면 기존 트랜잭션을 일시중지하고 새로운 트랜잭션을 시작한다.
+		새로 시작된 트랜잭션이 종료된 뒤에 기존 트랜잭션이 계속된다.
+	SUPPORTS
+	NOT_SUPPORTS
+	NEVER
+	NESTED
+
+	- 실습
+		ㄴ 트랜잭션이 걸려져 있는 메서드 안에서 트랜잭션이 걸려져 있는 또 다른 메서드를 호출하는 환경으로 설정하기
+		
+		(1) 공지사항 쓰기 작업을 할 때 메서드를 아래와 같이 설정
+			@Transactional(REQUIRED)
+			insertAndPointUpMember(){
+				insert();
+				insert();
+			}
+			
+			이전에 있던 insert() 메서드를 수정
+			@Transactional(REQUIRED)
+			insert(){
+				1. 새글작성
+				2. 포인트 증가
+			}
+
+			결과
+			  공지사항 TEST 7 TEST 7-2  => 모두 롤백 
+			  > 하나의 트랜잭션에 묶여져 있기 때문에 롤백이 되어진다.
+		
+		(2) @Transactional(REQUIRED) insertAndPointUpMember() 주석 처리
+			결과
+			 공지사항 TEST 7 TEST 7-2(롤백X) 
+			 포인트   2       3(롤백) 
+				
+			insert()만 @Transactional(REQUIRED) 되어 있어서 트랜잭션 처리가 되지 않는다.
+			이유? AOP 방식 트랜잭션 처리
+				ㄴ @T insert() 
+				ㄴ @T insert()
+				
+			* 해결? insertAndPointUpMember()와 insert() 메서드를 다른 클래스에 있도록 클래스를 분리하기
+				서비스 클래스 추가(트랜잭션)
+					ㄴ 공지사항 등록 + 포인트 증가 메서드를 호출
+					
+		(3) newlecture.service 패키지
+				ㄴ MemberShpService 인터페이스
+				ㄴ NLMemberShipService 클래스
+			MemberShpService 에서 insertAndPointUpOfMember 메서드를 분리
+			insertAndPointUpMember 분리를 하고 @Transactional 애노테이션은 추가하지 않았음
+			insert() 메서드에만 @Transactional 추가되어짐
+			공지사항 TEST 8 TEST 8-2(롤백)
+			포인트    2      3(롤백)
+			
+		(4) 2개의 메서드에 모두 @Transactional 추가
+			Service.insertAndPointUpMember(){} - 인터페이스에 애노테이션 추가함
+				Dao.insert(); TEST 9
+				Dao.insert(); TEST 9-2
+			모두 롤백 되어진다.
+			현재 진행 중인 트랜잭션에 합류 - REQUIRED
+			
+		(5) insert() 메서드의 @Transactional을 REQUIRES_NEW로 변경 -> 항상 새로운 트랜잭션으로 진행(종료된 두 기존 트랜잭션 계속)
+			---------->			 일시중지 ---------->				---------->
+						----------->      			----------->      == insert() 메서드
+						TEST 9/2(커밋)				TEST 9-2/3(롤백)	
+			

@@ -1,0 +1,100 @@
+[springTransaction06 프로젝트]
+/customer/notice.htm
+
+[ 스프링 트랜잭션 격리 레벨(Isolation) ]
+
+체크 제약조건 삭제
+유일성 제약조건 삭제
+ALTER TABLE member DROP CONSTRAINT ck_member_point;
+ALTER TABLE notices DROP CONSTRAINT uk_notices_title;
+
+1. 격리성?
+	트랜잭션 처리 과정에 두 개 이상의 트랜잭션이 진행 중일 때
+	서로 동시에 같은 자원에 접근하면 트랜잭션 처리는 어떻게 진행해야 하는가?
+
+2. 격리 레벨(수준) 지정해줘야한다.
+	- 트랜잭션을 하나의 쓰레드라고 생각한다면
+		멀티 쓰레드가 하나의 같은 자원(공유자원)을 사용하는 것을 동기화(동기화 처리)
+		ex.
+			A 쓰레드(사람)
+				공유자원(화장실 1개) == 임계영역 (잠금, Lock)
+										기다려(wait), 알림(notifyAll)
+			B 쓰레드(사람)
+	
+	- 실습(트랜잭션 동시성에 따른 문제점)
+		1) hitUp() 메서드 : 조회수 증가하는 메서드
+			공지사항 상세보기 -> 조회수 1 증가 
+		2) getHit() 메서드 : 조회수를 읽어와서 반환하는 메서드
+			
+	
+	- 용어정리
+		1) Dirty Read 상황
+			A 트랜잭션 진행 - hitup()
+			진입															종료
+			[            		 트랜잭션 진행 중...          				]
+			 update												커밋/롤백
+			 조회수 = 조회수(0) + 1
+			 hit = 1					[  ↑  ]
+			 						B 트랜잭션 진행 - getHit()
+			 						커밋/롤백을 안했는데 조회수를 읽어옴
+			 						hit = 1을 읽어오고 읽어온 다음에 위의 트랜잭션이 롤백을 함
+			 						hit는 다시 0으로 셋팅 되어지지만 B 트랜잭션은 hit = 1을 읽어옴
+			 						이런 상황을 Dirty Read 상황이라고 함
+			 						
+			 						여기서 @Transactional()
+			 								
+			 Dirty Read 상황 예시)
+			 					  참석조사 10명					실제 참석자 9명
+			 				보고 : 참석자 10명						참석자 9명
+				
+		2) Non-Repeatable Read 상황 : 첫 번째 작업일 때와 두 번째 작업일 때와 다른 결과를 가져가는 상황
+			A 트랜잭션 진행 - hitup()
+			2번의 조회수를 읽어가는 일
+			[  getHit()          			          			getHit()	]
+				조회수 = 0										조회수 = 1
+										[ ↑ ]
+									  B 트랜잭션 진행 hitUp()
+									  [조회수 = 1]
+			
+		3) Phantom Read 상황 : 여러 개의 행(레코드)를 한 번에 읽어오는 작업을 반복할 경우에 발생
+		A 트랜잭션 진행
+		[  emp 테이블에서 sal desc TOP 10								emp 테이블에서 sal desc TOP 10	]
+		   이 때의 레코드 10개의 값과									이 때의 레코드 10개의 값이 다름
+											  	[ ↑ ]
+									 		 B 트랜잭션 진행 - king 5000 삭제
+									 		 B 트랜잭션 진행 - king 500으로 수정
+	
+	- p512 표12.2 트랜잭션 격리 레벨 설정
+		DEFAULT(기본값) : 당시 사용하고 있는 DBMS의 격리 수준을 따르겠다.
+		READ_UNCOMMITTED : 커밋이 되지 않아도 읽을 수 있다 - Dirty Read 상황 발생 O
+		READ_COMMITTED : 커밋이 되어야지만 읽을 수 있다.(다른 트랜잭션에 의해 커밋된 데이터를 읽어올 수 있다) - Dirty Read 상황 발생 X
+		REPEATABLE_READ : 트랜잭션 처리가 될 때 까지 특정 행을 잠금(처음에 읽어 온 데이터와 두 번째 읽어 온 데이터가 동일한 값을 갖는다) - Non-Repeatable Read 상황 발생 X
+		SERIALIZABLE : 트랜잭션 처리가 될 때 까지 테이블의 모든 행을 잠금 처리(동일한 데이터에 대해서 동시에 두 개 이상의 트랜잭션이 수행될 수 없다) - Phantom Read 상황 발생 X
+		
+		(기억!) 격리 수준은 여러 개가 있지만 오라클이 제공하는 격리 수준은 2개 밖에 없다. READ_COMMITTED,	SERIALIZABLE
+			ㄴ 실습
+				1) NoticeDao, NLNoticeDao - hitUp() / getHit() 메서드 추가
+				2) CustomerController.noticeDetail() 공지사항 상세 = 조회수 증가 + 게시글 읽기 수정
+				
+				강제로 Dirty Read 상황 발생 시키도록 함
+				CustomerController.noticeDetail() 메서드에서 스레드 2개 생성(조회수 가져오기, 조회수 증가 스레드)
+				조회수 증가하는 일을 먼저 하도록 조회수를 가져오는 스레드를 0.5초 동안 중지(sleep)
+				그 사이에 조회수 증가하는 작업을 하도록 함
+				그 후에 조회수를 읽어온 뒤 hitUp을 1초 동안 sleep 시키고 강제로 롤백 시키도록 실행 예외 발생
+				> 결론은 읽어온 조회수와 실제 조회수와 다른 Dirty Read 상황 발생
+				
+			A 트랜잭션 진행 - hitup() hitUp_Threard.start()
+			진입															종료
+			[            				 Sleep(1000)	     			 ]
+			 update													 롤백 (throw RuntimeException)
+			 조회수 = 조회수(0) + 1
+			 hit = 1					[  ↑  ]
+			 						B 트랜잭션 진행 - getHit()
+			 						500ms 동안 sleep
+											
+				
+				
+				
+		
+		
+

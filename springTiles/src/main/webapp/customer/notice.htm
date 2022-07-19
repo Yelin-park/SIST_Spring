@@ -1,0 +1,159 @@
+[springTiles 프로젝트]
+/customer/notice.htm
+
+1. 격리 수준 - 설정 코딩 수정
+	CustomerController.noticeDetail() 수정
+	NLNoticeDao.hitUp() 수정
+
+2. 스프링 타일즈(Tiles)
+	1) 페이징 모듈화(집중화) ?
+		페이지마다 공통적인 영역(부분)을 모듈화해서 공통적으로 참조할 수 있도록 하는 방법
+	2) JSP 프로젝트 - @include 지시자, <jsp:include> 액션 태그 사용
+		layout 폴더
+			ㄴ TOP
+			ㄴ BOTTOM
+			ㄴ ASIDE
+	3) 스프링에서 페이지 모듈화할 수 있는 방법 = 스프링 타일즈
+	
+	4) Tiles 다운로드 설치, 설정
+		ㄱ. http://tiles.apache.org
+			 Tiles 2.2.2 (GA) 클릭 -> Tiles 2.2.2 (zip)	tiles-2.2.2-bin.zip 클릭 ->
+			 Downloads	archive.apache.org/dist/tiles/ 클릭 -> v2.2.2/ -> tiles-2.2.2-bin.zip
+					 
+				C:\tiles-2.2.2-bin\tiles-2.2.2 에서 아래 5가지 파일 lib 폴더에 추가
+				 파일1: tiles-api-2.2.2.jar
+				 파일2: tiles-core-2.2.2.jar
+				 파일3: tiles-jsp-2.2.2.jar
+				 파일4: tiles-servlet-2.2.2.jar
+				 파일5: tiles-template-2.2.2.jar
+			
+				이외에도 의존 관계를 가진 jar 파일 몇 개가 더 필요합니다.
+				경로2: C:\tiles-2.2.2-bin\tiles-2.2.2\lib 에서 아래 4가지 파일 lib 폴더에 추가
+				 파일6: jcl-over-slf4j-1.5.8.jar
+				 파일7: slf4j-api-1.5.8.jar
+				 파일8: commons-digester-2.0.jar
+				 파일9: commons-beanutils-1.8.0.jar
+				
+				경로3: C:\tiles-2.2.2-bin\tiles-2.2.2\lib\optional 에서 아래 파일 lib 폴더에 추가
+				 파일10: slf4j-jdk14-1.5.8.jar  
+				 
+	5) webapp 폴더      
+           ㄴ inc 폴더  - 모든 웹 페이지에서 공통적인 영역
+                  ㄴ header.jsp
+                  ㄴ footer.jsp
+                  ㄴ layout.jsp
+                             
+           ㄴ joinus 폴더
+                  ㄴ inc 폴더
+                       ㄴ visual.jsp
+                       ㄴ aside.jsp
+                       ㄴ layout.jsp
+                                             
+           ㄴ customer 폴더         
+                 ㄴ inc 폴더  - 모든 웹 페이지에서 공통적인 영역
+                      ㄴ visual.jsp
+                      ㄴ aside.jsp
+                      ㄴ layout.jsp
+     
+     페이지 모듈화(집중화) 작업
+    6) notice.jsp 선택 -> header.jsp, footer.jsp, aside.jsp, navi.jsp, notice.jsp는 content만
+    	noticeReg.jsp noticeEdit.jsp noticeDetail.jsp -> content만
+    
+    7) join.jsp 선택 -> aside.jps, navi.jsp, layout.jsp, join.jsp는 content만
+    	login.jsp도 content만
+    
+    8) notice.htm 공지사항 목록 요청
+    
+     ** webapp/customer/inc/layout.jsp ** 
+     위의 페이지에 구성된 대로 아래와 같은 타일로 붙여서 만드는 것
+    [ webapp/inc/header.jsp ] 
+    [ webapp/customer/inc/visual.jsp ] 
+    [ webapp/customer/inc/aside.jsp ] 
+    [ webapp/customer/inc/notice.jsp ] 
+    [][][][][][][][][][][][]
+    [][][][][][][][][][][][]
+    [][][][][][][][][][][][]
+    [][][][][][][][][][][][]
+    [ webapp/inc/footer.jsp ]
+    
+    9) https://tiles.apache.org/2.2/framework/index.html
+     	tutorial -> basic -> creating pages
+     	Create a definition
+     		ㄴ /WEB-INF/tiles-defs.xml 파일을 생성 후 아래 코드 복사 붙여넣기
+			<!DOCTYPE tiles-definitions PUBLIC
+			       "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+			       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+			<tiles-definitions>
+			  <definition name="myapp.homepage" template="/layouts/classic.jsp">
+			    <put-attribute name="title" value="Tiles tutorial homepage" />
+			    <put-attribute name="header" value="/tiles/banner.jsp" />
+			    <put-attribute name="menu" value="/tiles/common_menu.jsp" />
+			    <put-attribute name="body" value="/tiles/home_body.jsp" />
+			    <put-attribute name="footer" value="/tiles/credits.jsp" />
+			  </definition>
+			</tiles-definitions>
+
+	10) 지금까지
+		notice.htm -> CustomerController.java
+						ㄴ notices() 컨트롤러 메서드 호출
+							-> List<Notice> list = this.noticeDao.getNotices(page, field, query) 메서드 호출
+								model.addObject("list", list)
+								return "notice.jsp"
+		
+		바로 notice.jsp 응답할 것이 아니라 코딩을 수정해야함
+		공지사항 목록을 뿌리는 스프링 타일즈의 ViewResolver를 사용해서 원하는 부분에 타일을 붙이고 뿌려주어야 함
+     	  return "customer.notice" == View Name **
+     	
+     11) ㄱ. dispatcher-servlet.xml에서 스프링 타일즈를 사용하겠다는 설정      
+     	 ㄴ. 스프링 타일즈를 사용하기 위해 필요한 빈 객체 등록
+     	 ㄷ. ViewResolver 등록(처음으로 명시적으로 ViewResolver 등록)
+     
+     12) tiles-defs.xml에서 customer.notice 요청에 대한 스프링 타일즈에 대한 정의가 필요함
+			<tiles-definitions>
+				<definition name="customer.notice" template="/customer/inc/layout.jsp"> => 레이아웃으로 사용할 jsp
+				   	<put-attribute name="header" value="/inc/header.jsp" /> => 그 안에서 붙일 헤더
+				    <put-attribute name="footer" value="/inc/footer.jsp" />
+				    <put-attribute name="visual" value="/customer/inc/visual.jsp" />
+				    <put-attribute name="aside" value="/customer/inc/aside.jsp" />
+				    <put-attribute name="content" value="/customer/notice.jsp" />
+				</definition>
+			</tiles-definitions>     
+     
+     	jsp 페이지에서는
+     	<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %> 태그 라이브러리 추가
+     	<tiles:insertAttribute name="header" /> 이 태그에 해당하는 name은 tiles-defs.xml에서 정의한 이름사용
+     
+     13) login.jsp, join.jsp, index.jsp 스프링 타일즈 사용하도록 설정
+     	joinus/inc/layout.jsp -> 코딩 수정 <tiles:insertAttribute name="header" />
+     	JoinController.java		
+     	
+     	HomeController 코딩 수정
+     	/inc/layout.jsp 코딩 수정
+     	
+     14) jsp 페이지를 바로 요청하면 404 에러 발생
+     	http://localhost:7080/springTiles/customer/notice.jsp
+     	JSP 페이지는 바로 요청/응답 못하도록 처리
+     		>!point!< WEB-INF 폴더 안에는 외부에서 접근 할 수 없다.
+     			ㄴ views 폴더 생성하여 모든 jsp 파일을 옮기기
+     			
+     15) 문제점
+     	- 로그인 메뉴를 클릭하면 CSS 깨진다.
+     	- HOME에 이미지가 안보임
+     
+     내일
+     	Maven 빌드 도구 설명 + 설치
+     	STS를 다운받아서 Maven 프로젝트 + 스프링 MVC 프로젝트
+     	STS 툴 + 스프링 MVC 다루기
+     	STS 툴 + 스프링 Security
+     	STS 툴 + 스프링 + MyBatis
+     	
+     	7월 23일부터 각자 스프링 프로젝트 진행
+     	월(7/25)~수(7/26) 실무 예제로 오전 4시간 수업  목,금,월,화는 AWS
+     	오후 프로젝트 진행 - 수료할 때 까지
+     	
+     	 
+     
+     
+     
+     
+   
