@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><!-- 스프링 타이즈를 위해 태그라이브러리 추가 -->
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %><!-- 스프링 타일즈를 위해 태그라이브러리 추가 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
