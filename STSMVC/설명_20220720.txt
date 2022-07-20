@@ -1,0 +1,148 @@
+오늘부터 이클립스로 개발안함!
+
+1. STS(Spring Tool Suite)
+    ㄴ 이클립스 + 스프링 개발 전용 도구 (스프링 전용의 이클립스)
+
+2. http://spring.io
+	Projects -> Spring Tools4
+
+3. 버전
+   STS4 - Spring Boot + 설치(플러그인)하면 다른 것으로도 spring 개발 가능
+   STS3 - Spring Boot / Spring Legacy(전통적인 방식)
+
+수업은 STS3을 받아서 Spring Legacy로 할 것! 이 것을 알아야 Spring Boot도 접근하기 쉬움
+	https://github.com/spring-attic/toolsuite-distribution/wiki/Spring-Tool-Suite-3 접속
+
+	이클립스의 버전을 확인 후 같은 버전의 STS를 다운받아야함
+	Version: 2021-06 (4.20.0)
+
+	Spring Tool Suite 3.9.17 (New and Noteworthy)
+	full distribution on Eclipse 4.20
+	https://download.springsource.com/release/STS/3.9.17.RELEASE/dist/e4.20/spring-tool-suite-3.9.17.RELEASE-e4.20.0-win32-x86_64.zip
+	다운로드 받은 후 압축 풀기
+
+	C:\spring-tool-suite-3.9.17.RELEASE-e4.20.0-win32-x86_64\sts-bundle\sts-3.9.17.RELEASE\STS.exe 를 보내기 -> 바탕화면 바로가기
+
+	JDK 버전 문제로 3.9.13으로 사용!
+	
+4. STSMVC 스프링 프로젝트 생성
+	pom.xml
+		스프링 프레임워크 버전 4.0.4 버전으로 수정
+		JRE와 자바버전 1.8로 수정
+	STSMVC 프로젝트 우클릭 -> Maven -> Update Project 클릭
+
+5. MVC 구조 확인
+	1) MV[C] front controller 확인 -> web.xml 확인하기
+		dispatcher-servlet.xml 대신에 servlet-context.xml 사용
+		dispatcher-service.xml 대신에 root-context.xml 사용
+	
+	ㄱ. 공통 빈을 사용하기 위해서 부모-자식 계층으로 설정한 코드(root-context.xml == dispatcher-service.xml 같은 기능)
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring/root-context.xml</param-value>
+	</context-param>
+	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	
+	2) 요청URL -> 컨트롤러 메서드
+		org.doit.web 패키지
+		 ㄴ HomeController.java
+		 
+		 @RequestMapping("/")
+		 String home(){
+		 	return "home"; => servlet-context.xml에 아래 코딩이 있음
+		 		요청 View Name을 가지고 ViewResolver를 가지고 /WEB-INF/views/ViewName.jsp로 만들어준다.(/WEB-INF/views/home.jsp)
+		 		<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+					<beans:property name="prefix" value="/WEB-INF/views/" />
+					<beans:property name="suffix" value=".jsp" />
+				</beans:bean>
+		 	
+		 	return "index.jsp"; => 처음에는 바로 jsp 응답
+		 	return "home.index"; => tiles-defs.xml에서 <definition name="home.index">으로 응답
+		 } 
+		 
+		 * 서버에서 프로젝트 바꾸고 리스타트하기 *
+
+ 6. p260
+	Maven 프로젝트는 jar를 pom.xml에 코딩으로 설정하면..
+	pom.xml 코딩을 추가하면 원격저장소(centeral repository)에 필요한 jar 파일들을 로컬 저장소(local repository)에 다운로드받음
+																			C:\Users\user\.m2\repository
+
+여기까지 STS3로 STSMVC 스프링 + 메이븐 프로젝트 생성 및 구조 확인
+오후에는 STSMVC02 프로젝트 생성해서 springTiles 프로젝트를 그대로 변환
+
+------------------------------------------------------------------
+1. Maven(메이븐) 빌드 도구 설명	/ Gradle(그래들)도 있지만 메이븐 사용
+	
+	- 원래 빌드? 컴파일 + 실행
+	- 여기서 말하는 빌드 도구는? 프로젝트 생성에서부터 마지막 단계인 배포까지 관련된 통합 관리 도구		
+	- 프로젝트 전 과정
+		1. 프로젝트 생성
+		2. 라이브러리 설정
+		3. 코딩(개발) 작업
+		4. 컴파일(.class)
+		5. 테스트 -> junit 단위 테스트
+		6. 패키지 생성
+		7. 인스톨(설치) 만들기
+		8. 배포															
+
+2. 메이븐 다운로드 + 설치 + 설정
+	
+	1) https://maven.apache.org/
+		좌측 Download apache-maven-3.8.6-bin.zip 다운로드 후 압축 풀기 -> C드라이브에 넣기
+	
+	2) 환경설정
+		환경변수 설정하고 cmd에서 mvn -version으로 확인하기
+			Apache Maven 3.8.6 (84538c9988a25aec085021c365c560670ad80f63)
+			Maven home: C:\apache-maven-3.8.6
+			Java version: 1.8.0_321, vendor: Oracle Corporation, runtime: C:\Program Files\Java\jdk1.8.0_321\jre
+			Default locale: ko_KR, platform encoding: MS949
+			OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
+
+3. mvn.exe 메이븐 프로젝트 생성
+	*** java project *** 생성!
+	web project
+
+	(C:\Class\MvnClass)	
+	Class 폴더
+		ㄴ MvnClass 폴더 생성 - 메이븐으로 작업할 workspace
+
+ 1) 프로젝트 생성	
+	cmd 창에서 폴더로 이동 후 명령어 입력을 하면 프로젝트 생성이 되어짐
+	C:\Users\Yelin Park>cd C:\Class\MvnClass
+	C:\Class\MvnClass>mvn archetype:generate -DgroupId=com.newlecture -DartifactId=javaprj -DarchetypeArtifactId=maven-archetype-quickstart
+		
+		[ 명령어 설명 ]
+			mvn(.exe) => 메이븐이라는 툴을 가지고
+			archetype:generate
+			-DgroupId=com.newlecture => 그룹ID는 TOP-LEVEL 패키지 명을 뜻함 (org.doit.web 주는 것과 동일)
+			-DartifactId=javaprj	=> 생성될 프로젝트 명
+			-DarchetypeArtifactId=maven-archetype-quickstart =>	java project 생성
+			(-DarchetypeArtifactId=maven-archetype-webapp =>	web project 생성)
+	
+ 2) 컴파일
+	다운로드가 완료되면 cmd에서 cd javaprj 명령어 입력 후
+	그 후에 프로젝트 폴더명으로 들어가졌다면 mvn compile 명령어로 컴파일 하기
+	
+ 3) 테스트
+ 	cmd에서  mvn test 명령어로 단위 테스트 진행
+	
+ 4) 패키지 생성
+	cmd에서 mvn package 명령어 입력 후 패키지 생성하기
+	
+ 5) 인스톨(설치) => 로컬저장소(.m2/repository)에 저장
+		cmd에서 mvn install 명령어 사용
+		C:\Users\Yelin Park\.m2\repository\com\newlecture\javaprj\1.0-SNAPSHOT\javaprj-1.0-SNAPSHOT.pom
+	
+	배포 : 로컬저장소에 있는 것을 원격저장소에 저장하는 것
+	cmd에서 mvn deploy 명령어 사용
+		
+	여기까지한게 File -> new -> java project 생성과 동일한 것
+----------------------------------------------
+		
+		
+		
+		
+												

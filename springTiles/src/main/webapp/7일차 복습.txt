@@ -1,0 +1,77 @@
+[springTiles 프로젝트]   
+- 페이징 모듈화 관련 스프링 타일즈에 대해서 설정 및 처리 과정 별  코딩 설명을 하세요 . 
+    
+ 1. 스프링 타일즈를 사용하기 위해서는 스프링 타일즈를 다운로드받고 설정을 해주어야 한다.
+    타일즈.아파치 홈페이지에 접속 후 Tiles 2.2.2 bit.zip을 받아서 압축을 풀고
+     http://tiles.apache.org
+			 Tiles 2.2.2 (GA) 클릭 -> Tiles 2.2.2 (zip)	tiles-2.2.2-bin.zip 클릭 ->
+			 Downloads	archive.apache.org/dist/tiles/ 클릭 -> v2.2.2/ -> tiles-2.2.2-bin.zip
+    
+2.    10개의 jar 파일을 lib 폴더에 추가한다.
+				 파일1: tiles-api-2.2.2.jar
+				 파일2: tiles-core-2.2.2.jar
+				 파일3: tiles-jsp-2.2.2.jar
+				 파일4: tiles-servlet-2.2.2.jar
+				 파일5: tiles-template-2.2.2.jar
+				 파일6: jcl-over-slf4j-1.5.8.jar
+				 파일7: slf4j-api-1.5.8.jar
+				 파일8: commons-digester-2.0.jar
+				 파일9: commons-beanutils-1.8.0.jar
+				 파일10: slf4j-jdk14-1.5.8.jar 
+	
+3.	그 후에 공지사항, 메인, 회원로그인과 회원가입 페이지를 영역을 나누어 페이지 모듈화(집중화) 작업을 한다.
+	해당하는 notice.jsp나 login.jsp에는 content만 남겨두고 각 영역은 각 영역의 jsp 페이지에 붙여넣기한다.
+	
+4. 	스프링 타일즈를 사용하기 위해서는 설정도 해주어야 하는데
+	WEB-INF 폴더 안에 tiles-defs.xml 폴더 생성 후 아래 코드를 복사 붙여넣기한다.
+	인코딩은 UTF-8로 설정해주어야 한다.
+		<?xml version="1.0" encoding="UTF-8"?>
+		<!DOCTYPE tiles-definitions PUBLIC
+		       "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN"
+		       "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+		       
+		<tiles-definitions>
+			<definition name="customer.notice" template="/customer/inc/layout.jsp">
+				<put-attribute name="title" value="Tiles tutorial homepage" />
+			</definition>
+		</tiles-definitions>
+
+5.	스프링 타일즈를 사용하면 XXX.jsp로 바로 응답할 것이 아니고 ViewResolver를 사용해서 원하는 부분에
+	타일을 붙여서 보여주어야 하기 때문에 return해주는 문자열을 View Name으로 수정해 주어야 한다.
+	컨트롤러 메서드 중 포워딩 방식으로 응답하는 메서드의 return을 개발자 마음대로 View Name을 지정해준다.
+	이 부분은 명시적으로 ViweResolver을 등록하는 것이다.
+	
+6.	그 후에 dispatcher-servlet.xml에서 스프링 타일즈 빈객체와 ViewResolver 빈객체를 등록해준다.
+		1) 스프링 타일즈 빈 객체
+	   <bean id="tilesConfigurer"
+	      class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+	      <property name="definitions" value="/WEB-INF/tiles-defs.xml"></property>
+	   </bean>
+	   <bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+	      <property name="viewClass"
+	         value="org.springframework.web.servlet.view.tiles2.TilesView"></property>
+	   </bean>
+	
+	   2) ViewResolver 빈 객체
+	   <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"></bean>
+	   
+7.	다시 tiles-defs.xml 돌아와서 return으로 준 View Name 요청에 대한 정의를 해준다.
+	definition 태그의 name 속성에는 return 해주는 View Name을,
+	template에는 페이지의 레이아웃 jsp가 있는 경로를 설정
+	put-attribute 태그의 name 속성에는 레이아웃의 각 영역에 집어넣을 헤더와 푸터와 같은 name을
+	value에는 해당 영역의 jsp 페이지가 있는 경로를 설정해준다.  
+	경로에서 중복되는 경로는 * 으로 표시하여 순서대로 {n}으로 표시할 수도 있다.
+		<tiles-definitions>
+			<definition name="customer.notice" template="/customer/inc/layout.jsp">
+				<put-attribute name="title" value="Tiles tutorial homepage" />
+			</definition>
+		</tiles-definitions>
+	
+8.	layout.jsp에서 스프링 타일즈 사용을 위해 태그라이브러리를 추가한 뒤
+		<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
+    아래 태그로 tiles-defs.xml에서 설정했던 name으로 해당 영역의 jsp 페이지를 타일처럼 붙인다.
+   		<tiles:insertAttribute name="header" />
+    
+추가) 모든 작업을 마친 후에 jsp 요청/응답은 바로하지 못하도록
+     WEB-INF 폴더 안에 views 폴더를 생성하여 jsp 페이지를 모두 옮겨 넣었다. 
+   

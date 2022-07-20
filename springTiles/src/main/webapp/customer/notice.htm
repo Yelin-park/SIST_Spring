@@ -150,9 +150,29 @@
      	7월 23일부터 각자 스프링 프로젝트 진행
      	월(7/25)~수(7/26) 실무 예제로 오전 4시간 수업  목,금,월,화는 AWS
      	오후 프로젝트 진행 - 수료할 때 까지
-     	
-     	 
-     
+ ---------------------
+ 2022.07.20(수) Spring days08
+ 
+ 1. 문제1번 해결하기
+ 		http://localhost:7080/springTiles/customer/notice.htm - 공지사항
+ 		http://localhost:7080/springTiles/joinus/join.htm - 회원가입
+ 		
+ 		[inc/header.jsp 수정]
+   			http://localhost:7080/springTiles/joinus/notice.jsp - 로그인 클릭 후 고객센터를 누르니 404 오류 발생
+     		a링크 태그에 href 속성에 notice.htm으로만 지정해주어서 joinus/notice.htm에 요청에 해당하는 컨트롤러 메서드가 X
+     		근본적으로 문제 해결을 하기 위해서 상대경로가 contextPath/절대경로로 수정해주어야한다.
+     			${ pageContext.request.contextPath }
+     		
+     	header.jsp와 footer.jsp의 수정 
+     	customer/inc/aside.jsp 수정
+     	joinus/inc/aside.jsp 수정
+
+2. 문제2번 해결하기   
+	http://localhost:7080/springTiles/joinus/login.htm - 로그인 부분 style 적용 X 깨짐
+	로그인 페이지의 css 깨지는 문제
+	로그인 페이지의 헤더인데 join.css 적용되어져 있음
+	tiles-defs.xml에 <put-attribute name="css" value="{2}.css" /> 추가하고
+	layout.jsp에 css 적용하는 href 속성에 <tiles:getAsString name="css" /> 추가
      
      
      
