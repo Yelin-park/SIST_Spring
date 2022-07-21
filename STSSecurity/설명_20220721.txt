@@ -1,0 +1,185 @@
+[STSSecurity 프로젝트]
+	p654 스프링 시큐리티를 이용한 웹 보안
+	p654 ~ p667 정독
+	
+	1. 웹 개발자가 필요한 웹 보안 + 스프링 Security
+		1) 인증(Authentication) 처리 - 어떤 회원이던 상관없이 로그인을 해서 현재 사용자가 확인이 되는 것
+			ex) 관리자로 로그인한 것은 인증
+		2) 인가(Authorization) 처리 - 인증받은 사용자가 권한이 있는지 체크하는 것
+			ex) 관리자가 로그인해서 관리자 권한이 있는지 확인하는 것
+		3) UI 처리
+			ex) 인증을 받고 권한이 있다면 보이도록하거나 활성화
+				그렇지 않다면 보이지않거나 비활성화 처리하는 것
+				[수정][삭제] 버튼
+	
+	2. 스프링 시큐리티 퀵 스타트(p654)
+		1) 사용자의 접근을 제어하는 웹 어플리케이션(교재의 예제)
+			역할(ROLE) 종류 : ROLE_ADMIN(최고관리자), ROLE_MANAGER(매니저) 권한 존재 + ROLE_USER(일반)
+			
+		2) 스프링에서 제공하는 시큐리티를 사용하게 되면...
+			- 기본 제공 + 개발자 용도 별로 확장 가능(라이브러리 사용해서)
+			- 웹보안(인증+인가)처리를 보다 빠르게 구현할 수 있다.
+			
+		3) 스프링으로 웹보안 처리를 하려면 pom.xml에서 의존 모듈을 설정해야한다.(아래 3가지 추가)
+			https://mvnrepository.com 에서 검색 후 추가 + 스프링 버전에 따라 자동으로 바뀌도록 version에 ${org.springframework-version} 수정
+			ㄱ. spring-security-web
+			ㄴ. spring-security-config
+			ㄷ. spring-security-tablibs
+		
+		   Tip) 만약 제대로 안되면 repository를 삭제하고 다른 사람한테 받거나 다시 다운로드 받기(다운로드 받다가 문제 발생할 수 있음)
+		   
+		4) 스프링 시큐리티 관련된 xml 설정하기
+				교재에는 src/main/resources 폴더 안에 spring-security.xml 설정하고 있음
+				왜 저기에 넣고 servlet-context.xml안에 있는 아래 코딩은 무엇인가? (검색해보기)
+				<mvc:resources mapping="/resources/**" location="/resources/" />
+
+			지금 예제에서는 WEB-INF/spring 폴더 안에 spring-security.xml 추가!
+				NEW -> spring Bean Configuration File로 생성 
+			
+			만약에 resource 폴더에 넣었다면 자동으로 읽혀지지만 우리는 다른 곳에 추가했기 때문에 읽어오는 작업을 해야함
+			web.xml에 context-param 태그 안에 param-value안에 /WEB-INF/spring/spring-security.xml 추가
+				<context-param>
+					<param-name>contextConfigLocation</param-name>
+					<param-value>
+						/WEB-INF/spring/root-context.xml
+						/WEB-INF/spring/spring-security.xml
+					</param-value>
+				</context-param>
+		
+		5) p661 spring security 관련 필터 추가(web.xml)
+   			<filter>
+      			<filter-name>springSecurityFilterChain</filter-name>
+      			<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+   			</filter>
+   			<filter-mapping>
+      			<filter-name>springSecurityFilterChain</filter-name>
+      			<url-pattern>/*</url-pattern>
+   			</filter-mapping> 
+
+----- 여기까지가 스프링 시큐리티를 사용하기 위한 환경설정
+
+	3. 실습
+		1) 공지사항 목록보기 notice.htm 요청 -> 인증 X, 인가(권한) X
+		2) 공지사항 상세보기 noticeDetail.htm 요청 -> 인증 O, 인가(권한) X
+		3) 공지사항 쓰기 noticeReg.htm 요청 -> 인증 O, 인가(권한 / 관리자 권한 ROLE_ADMIN) O
+		
+	4. 위의 정책대로 정했다면 스프링 보안(인증, 인가(권한)) 설정하기
+		spring-security.xml 코딩	
+	
+	5. 사용자가 지정한 로그인 페이지를 연결하는 방법(/joinus/login.htm 요청을 하면 우리가 만든 로그인 페이지로 이동)
+		지금은 spring-security.xml의 <http auto-config="true"> 설정 때문에 스프링 전용 로그인 페이지로 이동함
+		spring-security.xml http 태그 안에 아래 설정을 해주면 사용자가 지정한 로그인 페이지로 연결해준다.
+			<form-login login-page="/joinus/login.htm" />
+	
+	6. p706참고 login.jsp 코딩 수정 - 입력받은 id, pwd 파라미터를 가지고 메모리상에 있는 id와 pwd 확인하는 방법
+		<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>	 추가
+		<form action="<c:url value="/j_spring_security_check" />" method="post">
+		id  : name 속성을 j_username 설정
+		pwd : nmae 속성을 j_password 설정
+		
+		
+			> 현재 : 로그인 실패하고 다시 로그인 페이지로 이동되어짐
+			> 변경 : 로그인 실패 경고 메시지 띄우기
+		spring-security.xml에서 authentication-failure-url="/joinus/login.htm?error" 설정으로
+		/joinus/login.htm?error 파라미터를 가지고 이동
+		
+		login.jsp에서 c:if로 메시지 출력
+	
+	7. 로그인 성공 했을 때 header.jsp 부분의 우측상단을 보면 Home 로그인 회원가입 으로 되어있는데 이 부분은
+		Home [홍길동님] 로그아웃 회원가입 으로 수정하기
+		
+		header.jsp에 태그라이브러리 추가 후 수정
+
+----------------------
+오후수업
+
+	8. 처음부터 로그인 버튼을 클릭한 후에 로그인이 성공하면 이동할 페이지 설정하기
+		spring-security.xml
+		default-target-url="/customer/notice.htm" 속성 추가
+		
+	9. p725 JSP 태그 라이브러리
+		현재 pom.xml에 설정되어있음
+		      <dependency>
+         		<groupId>org.springframework.security</groupId>
+         		<artifactId>spring-security-taglibs</artifactId>
+         		<version>${org.springframework-version}</version>
+      		  </dependency>
+      	
+      	header.jsp에 아래 코딩으로 수정
+      		<s:authorize ifNotGranted="ROLE_USER">
+				<a href="${ pageContext.request.contextPath }/joinus/login.htm">로그인</a>
+			</s:authorize>
+			<s:authorize ifAnyGranted="ROLE_USER, ROLE_ADMIN" >
+				<a href="${ pageContext.request.contextPath }/j_spring_security_logout">
+					[ ${ pageContext.request.userPrincipal.name} ]로그아웃
+				</a>
+			</s:authorize>
+
+	10.
+		iksoon 계정으로 로그인 했을 경우 공지사항 쓰기 X - 403 페이지 보여짐
+		park 계정으로 로그인 했을 경우 공지사항 쓰기 O
+		
+		글쓰기 권한이 없는 사람이 로그인을 했을 경우 notice.jsp 페이지에서 글쓰기 버튼을 숨기기
+		notice.jsp에서 코딩 수정
+			<s:authorize ifAllGranted="ROLE_USER, ROLE_ADMIN">
+				<p class="article-comment margin-small">
+					<a class="btn-write button" href="noticeReg.htm">글쓰기</a>
+				</p>
+			</s:authorize>
+	
+	11. 공지사항 쓰기 -> 작성자(writer)
+		'yaliny' 고정 값을 로그인 인증 받은 id로 수정
+						
+		CustomerController.noticeReg(){} 코딩 수정
+		notice.setWriter("yaliny"); =>
+		
+	12. p689 DB를 이용한 인증 처리 확인  -> Oracle / member 테이블 스프링 시큐리티 처리 - DB연동
+		
+		1) table 인증 <----> 스프링 시큐리티 연동 (스프링 시큐리티에 맞게 사용자 테이블을 만들어야한다.)
+			member 테이블
+				ㄴ enabled 컬럼 X
+				ㄴ role 역할 정보를 저장하는 컬럼 X
+		
+			p692 스프링 시큐리티와 맞는 테이블
+			CREATE TABLE users( == member 테이블과 동일
+				// 아래 3개의 컬럼은 필수!
+				username PK == member의 id
+				, password	== member의 pwd
+				, enabled(사용여부) == member에 없어서 추가 필요
+			); 
+			
+			// 역할을 가지고 있는 테이블 필요(하나의 member가 여러 개의 역할을 가질 수 있기 때문에
+			CREATE TABLE authorities(
+				username
+				, authority(역할)
+			);
+			
+			ex.
+				iksoon ROLE_USER
+				iksoon ROLE_ADMIN
+				hong ROLE_ADMIN
+			
+		2) 스프링 시큐리티에 맞게 테이블을 만들었다면 <jdbc-user-service> 태그를 사용해서 쉽게 연동할 수 있다.
+			p693 표16-4
+				users-by-username-query 속성
+					사용자 이름으로 UserDetails를 찾을 때 사용되는 쿼리를 입력한다.
+					규칙)
+						select로 선택된 결과 중 세 개 컬럼이 차례대로 사용자 이름, 암호, 사용가능여부로 사용
+						where 절에 1개의 인덱스 파라미터(물음표)를 포함해야 하며, 이 파라미터에 사용자 이름이 할당
+						
+				authorities-by-username-query 속성
+					사용자 이름을 권한 목록을 찾을 때 사용되는 쿼리 입력한다.
+					규칙)
+						select로 선택된 결과 중 두 번째 컬럼이 권한 값으로 사용된다.
+						where 절에 1개의 인덱스 파라미터(물음표)를 포함해야 하며, 이 파라미터에 사용자 이름이 할당
+				
+		
+		3) 회원가입하면 문제점 처리
+			id, birth, is_lunar, habit 잘 안들어가짐
+		
+		
+		
+		
+
+			
+		

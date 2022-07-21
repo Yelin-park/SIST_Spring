@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+
+	<!-- DispatcherServlet Context: defines this servlet's request-processing 
+		infrastructure -->
+
+	<!-- Enables the Spring MVC @Controller programming model -->
+	<mvc:annotation-driven />
+
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving 
+		up static resources in the ${webappRoot}/resources directory -->
+	<mvc:resources mapping="/resources/**" location="/resources/" />
+
+	<!-- dispatcher-servlet.xml -->
+
+	<context:component-scan base-package="org.doit.web"></context:component-scan>
+
+	<!-- 이름이 반드시 multipartResolver 이어야함 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- p439 표9.2 CommonsMultipartResolver 클래스의 프로퍼티 -->
+		<property name="maxUploadSize" value="-1"></property>
+	</bean>
+
+	<!-- @Transactional 애노테이션 사용한 트랜잭션 처리 -->
+	<tx:annotation-driven
+		transaction-manager="transactionManager" mode="proxy"
+		proxy-target-class="false" />
+
+	<!-- 스프링 타일즈 사용하기 위해 필요한 빈 객체 -->
+	<bean id="tilesConfigurer"
+		class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+		<property name="definitions" value="/WEB-INF/tiles-defs.xml"></property>
+	</bean>
+	
+	<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass"	value="org.springframework.web.servlet.view.tiles2.TilesView"></property>
+	</bean>
+
+	<!-- ViewResolver 등록 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"></bean>
+
+</beans>

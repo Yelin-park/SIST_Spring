@@ -1,0 +1,15 @@
+[STSMVC03 프로젝트]	
+	dispatcher-service.xml에 있는 설정을 root-context.xml에 잘라서 붙여넣음
+	dispatcher-servlet.xml에 있는 설정을 잘라서 servlet-context.xml 잘라서 붙여 넣음
+	
+	servlet-context.xml
+	tx와 aop 사용한다는 설정이 없어서 Namespaces에서 체크하여 설정
+	
+	beans: 접두사 지우고 3번째 xmlns:beans 지우고 1번째에 xmlns에는 mvc 추가	
+		xmlns:class3="강의장3"
+		xmlns="강의장5mvc" 기본네임스페이스 설정
+		<야리니>
+		<class3:야리니>
+	
+	springTiles에서 가져온 web.xml에 있는 필터 가져오고
+	url-mapping을 *.htm으로 수정
