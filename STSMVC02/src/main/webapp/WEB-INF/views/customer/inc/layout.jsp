@@ -10,7 +10,7 @@
 		<!-- <put-attribute name="title" value="Welcome~" /> -->
 		<title><tiles:getAsString name="title" /></title>
 		<!-- <put-attribute name="css" value="{2}.css" /> -->
-		<link href="<tiles:getAsString name="css" />" type="text/css" rel="stylesheet" />
+		<link href="notice.css" type="text/css" rel="stylesheet" />
 	</head>
 	<body>
 		<!-- 1. header 부분 시작 -->
