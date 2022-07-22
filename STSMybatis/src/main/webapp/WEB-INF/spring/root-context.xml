@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<!-- p482 - 스프링에서 DB연동할 때 사용하는 dataSource 객체 사용 / 개발 목적의 테스트 용도 -->
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName"
+			value="oracle.jdbc.driver.OracleDriver"></property>
+		<property name="url"
+			value="jdbc:oracle:thin:@localhost:1521:xe"></property>
+		<property name="username" value="scott"></property>
+		<property name="password" value="tiger"></property>
+	</bean>
+
+	<!-- p496 NamedParameterJdbcTemplate 사용 -->
+	<bean id="jdbcTemplate"
+		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<!-- NamedParameterJdbcTemplate 클래스 안에 setDataSource () 메서드가 없어서 아래 프로퍼티 
+			사용할 수 없음 -->
+		<!-- <property name="dataSource" ref="dataSource"></property> -->
+		<!-- 생성자로 의존 주입 -->
+		<constructor-arg ref="dataSource"></constructor-arg>
+	</bean>
+
+	<!-- p507 스프링 트랜잭션을 처리할 트랜잭션 매니저 등록 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!-- 트랜잭션을 처리하는 템플릿 등록 -->
+	<bean id="transactionTemplate"
+		class="org.springframework.transaction.support.TransactionTemplate">
+		<property name="transactionManager" ref="transactionManager"></property>
+	</bean>
+	
+	<!-- mybatis-spring.jar 모듈의 핵심 빈 객체 -->
+	<!-- sqlSessionFactory가 DAO 역할을 함 -->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+        <property name="mapperLocations">
+           <list>
+           		<!-- Mapper.xml 파일(NLNoticeDao.xml)에 쿼리를 작성하면 95% 코딩을 하지 않아도됨 -->
+             <value>classpath:org/doit/web/newlecture/dao/mapper/NLNoticeDao.xml</value>
+             <value>classpath:org/doit/web/newlecture/dao/mapper/NLMemberDao.xml</value>
+           </list>
+        </property>
+    </bean>
+    
+      <!-- DAO 구현하는 빈 객체 등록 == SqlSession -->
+    <bean id="sqlSession"  class="org.mybatis.spring.SqlSessionTemplate">
+      <constructor-arg ref="sqlSessionFactory"></constructor-arg>
+    </bean>
+	
+</beans>

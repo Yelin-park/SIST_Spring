@@ -1,0 +1,91 @@
+[STSMybatis 프로젝트]
+p563~p576 mybatis 연동지원
+	https://blog.mybatis.org/
+	product
+
+	1.마이바티스는 무엇인가?
+		DB 연동을 대신해주는 프레임워크이며, XML과 애노테이션 사용하는 방법이 있다.(즉, DAO를 대신하는 것)
+			ㄱ. 마이바티스는 개발자가 지정한 SQL, 저장프로시저 그리고 몇가지 고급 매핑을 지원하는 퍼시스턴스 프레임워크이다.
+			ㄴ. 마이바티스는 JDBC로 처리하는 상당부분의 코드와 파라미터 설정및 결과 매핑을 대신해준다.
+			ㄷ. 마이바티스는 데이터베이스 레코드에 원시타입과 Map 인터페이스 그리고 자바 POJO 를 설정해서 매핑하기 위해 XML과 애노테이션을 사용할 수 있다.
+			
+	2. Mapper XML 파일
+		ㄱ. 마이바티스의 가장 큰 장점은 매핑구문이다.
+		ㄴ. SQL Map XML 파일은 상대적으로 간단하다. 동일한 기능의 JDBC 코드(DAO)와 비교하면 아마도 95% 이상 코드수가 감소하기도 한다.
+		ㄷ. 마이바티스는 SQL을 작성하는데 집중하도록 만들어졌다.
+	
+		ㄹ. SQL Map XML파일은 첫번째(first class)엘리먼트만을 가진다.
+		ㅁ.	
+			cache - 해당 네임스페이스을 위한 캐시 설정
+			cache-ref - 다른 네임스페이스의 캐시 설정에 대한 참조
+			resultMap - 데이터베이스 결과데이터를 객체에 로드하는 방법을 정의하는 엘리먼트
+			parameterMap - 비권장됨! 예전에 파라미터를 매핑하기 위해 사용되었으나 현재는 사용하지 않음
+			sql - 다른 구문에서 재사용하기 위한 SQL 조각
+			insert - 매핑된 INSERT 구문.
+			update - 매핑된 UPDATE 구문.
+			delete - 매핑된 DELEETE 구문.
+			select - 매핑된 SELECT 구문.
+			
+	3. 동적 SQL
+--------------------------------------------------------
+1.
+	스프링	--> 모듈 설치	-->	MyBatis		-->		DB연동
+						 	ibatis(2.0)
+	
+	스프링에서는 모듈을 통해서 MyBatis와 연동을 하고 MyBatis를 통해 DB를 연동한다.
+	MyBatis를 쓰려면 DataSource 사용하며 트랜잭션 관리 기능을 MyBatis에 적용할 수 있다.
+
+2. MyBatis를 스프링과 연동하는 방법
+	1) mybatis-spring 모듈 추가 -> pom.xml에
+		스프링과 MyBatis와 연결하기 위한 설정
+      		<dependency>
+         		<groupId>org.mybatis</groupId>
+         		<artifactId>mybatis</artifactId>
+         		<version>3.2.3</version>
+      		</dependency>
+      		<dependency>
+         		<groupId>org.mybatis</groupId>
+         		<artifactId>mybatis-spring</artifactId>
+         		<version>1.2.2</version>
+      		</dependency>   
+      
+	2) SqlSessionFactoryBean을 이용해서 SqlSessionFactory 설정
+		SqlSession을 생성하는 공장을 빈 객체로 만들고 SqlSessionFactory로 SqlSession 생성
+		
+		ㄱ. root-context.xml에 아래 코드 추가
+		    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        		<property name="dataSource" ref="dataSource" />
+        		<property name="mapperLocations">
+           			<list>
+             			<value>classpath:org/doit/web/newlecture/dao/mapper/NLNoticeDao.xml</value>
+           			</list>
+      		    </property>
+    		</bean>
+    	
+    	ㄴ. org.doit.web.newlecture.dao.mapper 패키지 생성 후 NLNoticeDao.xml 파일 생성
+    	ㄷ. MyBatis 블로그의 시작하기에 매핑된 SQL 구문 살펴보기에 있는 코드 복사하여  NLNoticeDao.xml 파일에 붙여넣기
+	
+	3) 트랜잭션이 필요하다면 트랜잭션 설정도 해야함(건너뜀)
+	
+	4) MyBatis를 이용한 DAO 구현
+		ㄱ. SqlSession ==> DAO 이용 구현
+		ㄴ. 매퍼 동적 생성 이용 구현
+		
+-- 설정은 버전마다 조금씩 다를 수 있음 -- 
+
+	NLNoticeDao.xml에 쿼리 작성하고
+	root-context.xml에 sqlSessionFactory으로 'DAO 구현하는 빈 객체' 등록하기(DAO를 구현하기 위해)
+	CustomerController에 SqlSession 주입할 수 있도록 @Autowired 애노테이션 설정
+	
+	다 구현해서 NLNoticeDao.java 삭제해도됨
+	CustomerController 주입하고 있는 NoticeDao 주석처리
+	
+	NLNoticeDao.xml에 delete 메서드 주석처리하고 NoticeDao 인터페이스에 delete 메서드 위에
+	@Delete("DELETE FROM notices WHERE seq = #{seq}") 설정해도 가능
+		
+		
+		
+		
+
+			
+		

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.springframework.org/schema/security"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!--
+		스프링 시큐리티와 관련된 곳으로 매번 security 접두사 사용하기 힘들 기 때문에
+		4라인에 xmlns:security의 security 삭제하고 2라인에 beans: 접두사와 xmlns에 :beans를 붙이기
+	-->
+	<!-- http 태그가 보안(인증, 권한) 설정 -->
+	<!-- auto-config는 true 속성 : 로그인이 필요한 경우 스프링이 제공하는 전용 로그인 페이지를 사용합니다 라는 뜻 -->
+	<!-- <http auto-config="true"> -->
+	<http>
+		<!-- p706 표16.6
+			form-login: 사용자가 지정한 로그인 form(페이지)를 위한 설정 태그
+			login-page 속성은 로그인시 요청하는 URL 설정
+			authentication-failure-url : 로그인 실패시 이동할 경로를 지정해줌
+			default-target-url : 처음부터 로그인을 했을 때 이동할 페이지 설정
+			-->
+		<form-login
+			login-page="/joinus/login.htm"
+			authentication-failure-url="/joinus/login.htm?error"
+			default-target-url="/customer/notice.htm"
+		/>
+
+		<!-- p711 logout : 로그아웃을 성공했을 때 이동할 페이지 경로를 설정하는 태그 -->
+		<logout logout-success-url="/customer/notice.htm" />
+		
+		<!-- p662 인증과 권한을 설정하기 위해 intercept-url 태그 사용
+			 pattern 속성에 해당하는 요청이 들어오면
+			 access 속성에 해당하는 인가를 확인(해당 인가만 접근 가능) -->
+		<!-- notice.htm은 설정하지 않았는데 모두 접근할 수 있다는 뜻 -->
+		<intercept-url pattern="/customer/noticeDetail.htm" access="ROLE_USER, ROLE_ADMIN"/>
+		<intercept-url pattern="/customer/noticeReg.htm" access="ROLE_ADMIN"/>
+		<intercept-url pattern="/customer/noticeEdit.htm" access="ROLE_ADMIN"/>
+	</http>
+	
+	<!-- authentication-manager : 인증을 관리하는 태그 -->
+	<!-- Oracle member 테이블 - DB 연동 필요(오후에 작업) -->
+	<!-- 오전에는 가상 메모리 상(in-memory 방식)에 계정 생성 + 권한(ROLE) 부여 -->
+<!-- 	
+	<authentication-manager>
+		<authentication-provider>
+			<user-service>
+				계정 이름과 역할 설정
+				<user name="iksoon" authorities="ROLE_USER" password="1111"/>
+				<user name="admin" authorities="ROLE_ADMIN" password="2222"/>
+				<user name="park" authorities="ROLE_USER, ROLE_ADMIN" password="3333"/>
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+ -->
+ 
+ <!-- DB 연동 -->
+ <authentication-manager>
+     <authentication-provider>
+        <jdbc-user-service 
+            data-source-ref="dataSource"
+            users-by-username-query="select id as username, pwd as password, 1 as enabled from member where id = ?"
+            authorities-by-username-query="select id as  username , case when id IN ('yaliny', 'admin') then 'ROLE_ADMIN' else 'ROLE_USER' end as authority from member where id = ?"
+        />
+     </authentication-provider>
+  </authentication-manager>
+  
+</beans:beans>

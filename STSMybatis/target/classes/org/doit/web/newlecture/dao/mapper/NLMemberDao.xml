@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- mapper에는 DAO를 구현한 인터페이스의 풀네임을 설정 -->
+<!-- <mapper namespace="DAO를 구현한 인터페이스의 풀네임"> -->
+<mapper namespace="org.doit.web.newlecture.dao.MemberDao">
+<select id="getMember" resultType="org.doit.web.newlecture.vo.Member">
+	SELECT *
+	FROM MEMBER
+	WHERE id = ${id}
+</select>
+
+<insert id="insert">
+	INSERT INTO MEMBER
+	(ID, PWD, NAME, GENDER, BIRTH, IS_LUNAR, CPHONE, EMAIL, HABIT, REGDATE)
+	VALUES( #{ id }, #{ pwd }, #{ name }, #{ gender }, #{ birth }, #{ is_lunar }, #{ cphone }, #{ email }, #{ habit }, SYSDATE)
+</insert>
+</mapper>
