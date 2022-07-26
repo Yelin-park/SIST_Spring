@@ -29,12 +29,12 @@ import lombok.extern.log4j.Log4j;
 @RequestMapping("/sample/*")
 @Log4j
 public class SampleController {
-	
+	/*
 	@RequestMapping("")
 	public void basic() {
 		log.info("basic..");
 	}
-	
+	*/
 	@RequestMapping(value="/basic", method = {RequestMethod.GET})
 	public void basicGet() {
 		log.info("basic get");

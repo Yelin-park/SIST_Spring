@@ -9,10 +9,12 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import lombok.extern.log4j.Log4j;
 
+// 자동 스캔 + 예외 처리  (AOP)
 @ControllerAdvice
 @Log4j
 public class CommonExceptionAdvice {
 
+	// 컨트롤러에서 발생하는 모든 예외를 처리하는 메서드
 	@ExceptionHandler(Exception.class)
 	public String except(Exception ex, Model model) {
 
